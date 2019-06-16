@@ -1,8 +1,13 @@
+var sock;
+var login;
+
 function connection(){
-     var sock = new SockJS('/chat');
+     sock = new SockJS('/chat');
+
      sock.onopen = function() {
+         login = document.getElementById('name');
          console.log('open');
-         sock.send('test');
+         sock.send('connection is open');
      };
 
      sock.onmessage = function(e) {
@@ -13,4 +18,7 @@ function connection(){
      sock.onclose = function() {
          console.log('close');
      };
+}
+
+function sendMessage(){
 }
