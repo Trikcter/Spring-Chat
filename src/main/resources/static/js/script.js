@@ -1,24 +1,25 @@
-var sock;
-var login;
+var sock = new SockJS('/chat');
 
-function connection(){
-     sock = new SockJS('/chat');
+sock.onopen = function() {
+    console.log('open');
+};
 
-     sock.onopen = function() {
-         login = document.getElementById('name');
-         console.log('open');
-         sock.send('connection is open');
-     };
+sock.onmessage = function(e) {
+    console.log('message', e.data);
+    var messages = document.getElementById("chat");
+    messages.innerHTML = e.data;
+};
 
-     sock.onmessage = function(e) {
-         console.log('message', e.data);
-         sock.close();
-     };
+sock.onclose = function() {
+    console.log('close');
+};
 
-     sock.onclose = function() {
-         console.log('close');
-     };
+function onClose(){
+    sock.close();
 }
 
 function sendMessage(){
+    var message = document.getElementById("message").value;
+    var username = document.getElementById("username").innerText;
+    sock.send(username + ":" + message);
 }

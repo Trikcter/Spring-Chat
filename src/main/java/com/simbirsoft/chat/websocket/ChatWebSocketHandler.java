@@ -1,19 +1,26 @@
 package com.simbirsoft.chat.websocket;
 
-import org.springframework.web.socket.CloseStatus;
-import org.springframework.web.socket.WebSocketHandler;
-import org.springframework.web.socket.WebSocketMessage;
-import org.springframework.web.socket.WebSocketSession;
+import com.simbirsoft.chat.model.Message;
+import org.springframework.web.socket.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ChatWebSocketHandler implements WebSocketHandler {
+
+    private Set<WebSocketSession> sessions = new HashSet<>();
+    private Set<Message> messages = new HashSet<>();
+
     @Override
     public void afterConnectionEstablished(WebSocketSession webSocketSession) throws Exception {
-
+        sessions.add(webSocketSession);
     }
 
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
-
+        for(WebSocketSession session : sessions){
+            session.sendMessage(new TextMessage(webSocketMessage.getPayload().toString()));
+        }
     }
 
     @Override
@@ -23,7 +30,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession webSocketSession, CloseStatus closeStatus) throws Exception {
-
+        sessions.remove(webSocketSession);
     }
 
     @Override
