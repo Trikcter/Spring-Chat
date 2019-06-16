@@ -5,9 +5,29 @@ sock.onopen = function() {
 };
 
 sock.onmessage = function(e) {
-    console.log('message', e.data);
+    var words = e.data.split(":");
+
     var messages = document.getElementById("chat");
-    messages.innerHTML = e.data;
+
+    var messageElement = document.createElement('li');
+    messageElement.className += " collection-item avatar";
+
+    var spanElement = document.createElement("span");
+    spanElement.className += " title";
+    spanElement.appendChild(document.createTextNode(words[0] + " отправил:"));
+
+    var textnode = document.createElement("p");
+    textnode.appendChild(document.createTextNode(words[1]));
+
+    var img = document.createElement("img");
+    img.className += "circle";
+    img.src = "img/avatar_test.jpg";
+
+    messageElement.appendChild(img);
+    messageElement.appendChild(spanElement);
+    messageElement.appendChild(textnode);
+
+    messages.appendChild(messageElement);
 };
 
 sock.onclose = function() {
@@ -16,10 +36,13 @@ sock.onclose = function() {
 
 function onClose(){
     sock.close();
+    alert("Вы вышли из чата!");
 }
 
 function sendMessage(){
-    var message = document.getElementById("message").value;
+    var message = document.getElementById("message");
     var username = document.getElementById("username").innerText;
-    sock.send(username + ":" + message);
+    sock.send(username + ":" + message.value);
+
+    message.value = "";
 }
