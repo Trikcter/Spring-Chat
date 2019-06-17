@@ -42,7 +42,9 @@ function onClose(){
 function sendMessage(){
     var message = document.getElementById("message");
     var username = document.getElementById("username").innerText;
-    sock.send(username + ":" + message.value);
+
+    if(message.value != "")
+        sock.send(username + ":" + message.value);
 
     message.value = "";
 }
