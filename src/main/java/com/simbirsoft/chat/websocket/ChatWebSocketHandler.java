@@ -18,7 +18,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
 
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
-        for(WebSocketSession session : sessions){
+        for (WebSocketSession session : sessions) {
             session.sendMessage(new TextMessage(webSocketMessage.getPayload().toString()));
         }
     }
