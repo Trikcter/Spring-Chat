@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
     <head>
         <meta charset="UTF-8">
         <title>Чат</title>
@@ -10,6 +10,8 @@
         <link rel="stylesheet" href = "/css/style.css">
     </head>
     <body>
+        <form th:action="@{/messages}">
+        </form>
         <div class = 'container'>
             <div class="messages">
                 <ul id = "chat" class="collection">
