@@ -1,6 +1,6 @@
 package com.simbirsoft.chat.websocket;
 
-import com.simbirsoft.chat.model.Message;
+import com.simbirsoft.chat.entity.Message;
 import org.springframework.web.socket.*;
 
 import java.util.HashSet;

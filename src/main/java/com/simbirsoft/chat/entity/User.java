@@ -1,11 +1,11 @@
-package com.simbirsoft.chat.model;
+package com.simbirsoft.chat.entity;
 
 import javax.persistence.*;
 import java.util.Set;
 
 @Entity
 @Table(name = "users")
-public class Users {
+public class User {
     @Id
     @GeneratedValue
     private Long Id;
@@ -24,7 +24,7 @@ public class Users {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
-    public Users() {
+    public User() {
     }
 
     public Long getId() {

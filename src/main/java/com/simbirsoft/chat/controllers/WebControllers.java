@@ -1,15 +1,16 @@
 package com.simbirsoft.chat.controllers;
 
-import com.simbirsoft.chat.model.Role;
-import com.simbirsoft.chat.model.Users;
+import com.simbirsoft.chat.entity.Role;
+import com.simbirsoft.chat.entity.User;
+import com.simbirsoft.chat.model.UserDTO;
 import com.simbirsoft.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 
 @Controller
@@ -18,46 +19,39 @@ public class WebControllers {
     @Autowired
     private UserService userService;
 
-    @PostMapping(path = "/messages")
-    public String toChat(HttpServletRequest request, String username, Model model) {
+    @GetMapping(path = "/messages")
+    public String chat(Authentication authentication, Model model) {
 
-        if (username != null) {
-            username = username.trim();
+        String username = authentication.getName();
 
-            model.addAttribute("username", username);
-        }
+        model.addAttribute("username", username);
 
         return "messages";
     }
 
     @GetMapping("/index")
-    public String index(){
+    public String index() {
         return "index";
     }
 
     @GetMapping("/")
-    public String toLogin() {
+    public String login() {
         return "login";
     }
 
     @GetMapping("/registration")
-    public String toReg() {
+    public String registration() {
         return "registration";
     }
 
     @PostMapping("/registration")
-    public String addUser(Users user) {
-        Users userFromDB = userService.getByusername(user.getUsername());
+    public String addUser(User user) {
+        User userFromDB = userService.getByUsername(user.getUsername());
 
         if (userFromDB != null) {
             return "registration";
-        } else {
-            user.setRoles(Collections.singleton(Role.USER));
-            user.setActive(true);
-            userService.addUser(user);
-
-            return "redirect:/login";
         }
 
+        return "redirect:/";
     }
 }

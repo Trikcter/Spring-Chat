@@ -1,17 +1,20 @@
 package com.simbirsoft.chat.service;
 
-import com.simbirsoft.chat.model.Users;
+import com.simbirsoft.chat.entity.User;
+import com.simbirsoft.chat.model.UserDTO;
 
 import java.util.List;
 
 public interface UserService {
-    void addUser(Users user);
+    void addUser(UserDTO user);
 
     void delete(long id);
 
-    Users getByusername(String username);
+    User getByUsername(String username);
 
-    Users editUser(Users user);
+    User editUser(User user);
 
-    List<Users> getAll();
+    List<User> getAll();
+
+    User save(User user);
 }
