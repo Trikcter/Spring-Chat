@@ -1,6 +1,8 @@
 package com.simbirsoft.chat.websocket;
 
 import com.simbirsoft.chat.entity.Message;
+import com.simbirsoft.chat.service.MessageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.*;
 
 import java.util.HashSet;
@@ -11,6 +13,9 @@ public class ChatWebSocketHandler implements WebSocketHandler {
     private Set<WebSocketSession> sessions = new HashSet<>();
     private Set<Message> messages = new HashSet<>();
 
+    @Autowired
+    MessageService messageService;
+
     @Override
     public void afterConnectionEstablished(WebSocketSession webSocketSession) throws Exception {
         sessions.add(webSocketSession);
@@ -19,7 +24,11 @@ public class ChatWebSocketHandler implements WebSocketHandler {
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
         for (WebSocketSession session : sessions) {
-            session.sendMessage(new TextMessage(webSocketMessage.getPayload().toString()));
+            String[] mes = webSocketMessage.getPayload().toString().split(":");
+            Message message = new Message(mes[0], mes[1]);
+            messageService.save(message);
+
+            session.sendMessage(new TextMessage(message.getSocketMessage()));
         }
     }
 
