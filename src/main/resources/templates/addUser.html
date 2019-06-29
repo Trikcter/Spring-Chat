@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+    <title>Добавление пользователя</title>
+</head>
+<body>
+<form th:action="@{/panel/add}" method="post">
+    <div><label> User Name : <input type="text" name="username"/> </label></div>
+    <div><input type="submit" value="Регистрация"/></div>
+</form>
+</body>
+</html>

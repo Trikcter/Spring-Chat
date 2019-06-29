@@ -2,12 +2,13 @@ package com.simbirsoft.chat.model;
 
 import com.simbirsoft.chat.entity.Role;
 
-import java.util.Set;
+import java.util.List;
 
 public class UserDTO {
     private String username;
     private Boolean active;
-    private Set<Role> roleSet;
+    private List<Role> roleSet;
+    private Boolean isGod = false;
 
     public String getUsername() {
         return username;
@@ -25,11 +26,25 @@ public class UserDTO {
         this.active = active;
     }
 
-    public Set<Role> getRoleSet() {
+    public List<Role> getRoleSet() {
         return roleSet;
     }
 
-    public void setRoleSet(Set<Role> roleSet) {
+    public void setRoleSet(List<Role> roleSet) {
         this.roleSet = roleSet;
+
+        for(Role role:roleSet){
+            if((role.getAuthority() == "MODERATOR") | (role.getAuthority() == "ADMIN")){
+                isGod = true;
+            }
+        }
+    }
+
+    public Boolean getGod() {
+        return isGod;
+    }
+
+    public void setGod(Boolean god) {
+        isGod = god;
     }
 }
