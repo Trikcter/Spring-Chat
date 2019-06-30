@@ -11,7 +11,6 @@ import java.util.Set;
 public class ChatWebSocketHandler implements WebSocketHandler {
 
     private Set<WebSocketSession> sessions = new HashSet<>();
-    private Set<Message> messages = new HashSet<>();
 
     @Autowired
     MessageService messageService;
@@ -26,7 +25,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
         for (WebSocketSession session : sessions) {
             String[] mes = webSocketMessage.getPayload().toString().split(":");
             Message message = new Message(mes[0], mes[1]);
-            messageService.save(message);
+            Message send = messageService.save(message);
 
             session.sendMessage(new TextMessage(message.getSocketMessage()));
         }

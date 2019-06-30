@@ -4,15 +4,13 @@ import com.simbirsoft.chat.model.UserDTO;
 import com.simbirsoft.chat.service.MessageService;
 import com.simbirsoft.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -85,5 +83,11 @@ public class PanelController {
     public String addUser(UserDTO userDTO){
         userService.addUser(userDTO);
         return "redirect:/panel";
+    }
+
+    @GetMapping("/delmes/{id}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void delMessage(@PathVariable Long id){
+        messageService.delete(id);
     }
 }

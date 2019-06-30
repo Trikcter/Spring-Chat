@@ -48,6 +48,6 @@ public class Message {
     }
 
     public String getSocketMessage() {
-        return username + ":" + message;
+        return Id.toString() + ":" + username + ":" + message;
     }
 }

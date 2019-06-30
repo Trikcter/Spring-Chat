@@ -7,7 +7,7 @@ import java.util.List;
 public interface MessageService {
     Message save(Message message);
 
-    void delete(Message message);
+    void delete(Long id);
 
     List<Message> getAll();
 }
