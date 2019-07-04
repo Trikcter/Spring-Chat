@@ -17,60 +17,60 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/panel")
-@PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('MODERATOR') or hasAuthority('ROLE_MODERATOR')")
+@PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_MODERATOR')")
 public class PanelController {
     @Autowired
-    UserService userService;
+    private UserService userService;
 
     @Autowired
-    MessageService messageService;
+    private MessageService messageService;
 
     @GetMapping
-    public String index(Authentication authentication,Model model) {
+    public String getPanel(Authentication authentication,Model model) {
         List<UserDTO> users = userService.getAll();
-        Boolean isGod = false;
+        boolean isSuperuser = false;
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         for (GrantedAuthority grantedAuthority : authorities) {
             if (grantedAuthority.getAuthority().equals("ROLE_ADMIN")) {
-                isGod = true;
+                isSuperuser = true;
                 break;
             }
         }
 
         model.addAttribute("users",users);
-        model.addAttribute("isGod",isGod);
+        model.addAttribute("isSuperuser",isSuperuser);
 
         return "panelControl";
     }
 
-    @GetMapping("/delete/{username}")
-    public String deleteUser(@PathVariable String username){
-        userService.delete(username);
+    @DeleteMapping("/{id}")
+    public String deleteUser(@PathVariable Long id){
+        userService.delete(id);
         return "redirect:/panel";
     }
 
-    @GetMapping("/block/{username}")
-    public String blockUser(@PathVariable String username){
-        userService.blockUser(username);
+    @GetMapping("/block/{id}")
+    public String blockUser(@PathVariable Long id){
+        userService.blockUser(id);
         return "redirect:/panel";
     }
 
     @GetMapping("/unblock/{username}")
-    public String unBlockUser(@PathVariable String username){
-        userService.unBlockUser(username);
+    public String unblockUser(@PathVariable Long id){
+        userService.unblockUser(id);
         return "redirect:/panel";
     }
 
-    @GetMapping("/editRoles/{username}")
-    public String setModerator(@PathVariable String username){
-        userService.makeModerator(username);
+    @GetMapping("/roles/{username}")
+    public String setModerator(@PathVariable Long id){
+        userService.makeModerator(id);
         return "redirect:/panel";
     }
 
-    @GetMapping("/deleteRoles/{username}")
-    public String removeModerator(@PathVariable String username){
-        userService.removeModerator(username);
+    @DeleteMapping("/roles/{username}")
+    public String removeModerator(@PathVariable Long id){
+        userService.removeModerator(id);
         return "redirect:/panel";
     }
 
@@ -85,9 +85,9 @@ public class PanelController {
         return "redirect:/panel";
     }
 
-    @GetMapping("/delmes/{id}")
+    @DeleteMapping("/messages/{id}")
     @ResponseStatus(value = HttpStatus.OK)
-    public void delMessage(@PathVariable Long id){
+    public void deleteMessage(@PathVariable Long id){
         messageService.delete(id);
     }
 }

@@ -1,9 +1,10 @@
-package com.simbirsoft.chat.service;
+package com.simbirsoft.chat.service.implementation;
 
 import com.simbirsoft.chat.DAO.UserRepository;
 import com.simbirsoft.chat.entity.Role;
 import com.simbirsoft.chat.entity.User;
 import com.simbirsoft.chat.model.UserDTO;
+import com.simbirsoft.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,12 +14,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author Bolgov
+ * Сервис для управления User'ами
+ */
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Создание нового пользователя и добавление его в БД
+     * @param userDTO - DTO для User, приходящая с фронта
+     */
     @Override
     public void addUser(UserDTO userDTO) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -32,9 +41,13 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Удаление пользователя из БД
+     * @param username - имя пользователя
+     */
     @Override
-    public void delete(String username) {
-        User delUser = userRepository.findByUsername(username);
+    public void delete(Long id) {
+        User delUser = userRepository.findById(id).orElse(new User());
 
         userRepository.delete(delUser);
     }
@@ -49,6 +62,10 @@ public class UserServiceImpl implements UserService {
         return null;
     }
 
+    /**
+     * Получаем список всех пользователей в виде DTO для передачи на фронт
+     * @return список всех пользователей из БД
+     */
     @Override
     public List<UserDTO> getAll() {
         List<User> users = userRepository.findAll();
@@ -59,6 +76,7 @@ public class UserServiceImpl implements UserService {
 
             userDTO.setActive(user.getActive());
             userDTO.setUsername(user.getUsername());
+            userDTO.setId(user.getId());
 
             List<Role> roles = new ArrayList<>();
 
@@ -74,6 +92,11 @@ public class UserServiceImpl implements UserService {
         return answer;
     }
 
+    /**
+     * Сохраняем пользователя в БД
+     * @param user объект, который необходимо сохранить
+     * @return возвращаем новый объект в случае успешного сохранения в БД
+     */
     @Override
     public User save(User user) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -85,17 +108,25 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+    /**
+     * Метод для установки нового модератора
+     * @param username имя пользователя
+     */
     @Override
-    public void makeModerator(String username) {
-        User user = userRepository.findByUsername(username);
+    public void makeModerator(Long id) {
+        User user = userRepository.findById(id).orElse(new User());
         user.addRole(Role.MODERATOR);
 
         userRepository.save(user);
     }
 
+    /**
+     * Метод для удаления прав администратора
+     * @param username имя пользователя
+     */
     @Override
-    public void removeModerator(String username) {
-        User user = userRepository.findByUsername(username);
+    public void removeModerator(Long id) {
+        User user = userRepository.findById(id).orElse(new User());
         Set<Role> roleSet = user.getRoles();
 
         roleSet.remove(Role.MODERATOR);
@@ -105,17 +136,25 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    /**
+     * Метод для бана пользователя
+     * @param username имя пользователя
+     */
     @Override
-    public void blockUser(String username) {
-        User user = userRepository.findByUsername(username);
+    public void blockUser(Long id) {
+        User user = userRepository.findById(id).orElse(new User());
         user.setActive(false);
 
         userRepository.save(user);
     }
 
+    /**
+     * Метод для разбана пользователя
+     * @param username - имя пользователя
+     */
     @Override
-    public void unBlockUser(String username) {
-        User user = userRepository.findByUsername(username);
+    public void unblockUser(Long id) {
+        User user = userRepository.findById(id).orElse(new User());
         user.setActive(true);
 
         userRepository.save(user);

@@ -1,7 +1,8 @@
-package com.simbirsoft.chat.service;
+package com.simbirsoft.chat.service.implementation;
 
 import com.simbirsoft.chat.DAO.MessageRepository;
 import com.simbirsoft.chat.entity.Message;
+import com.simbirsoft.chat.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +24,7 @@ public class MessageServiceImpl implements MessageService {
     @Override
     public void delete(Long id) {
        Message message = messageRepository.findById(id).orElse(new Message());
-        messageRepository.delete(message);
+       messageRepository.delete(message);
     }
 
     @Override

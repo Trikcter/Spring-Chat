@@ -8,7 +8,7 @@ import java.util.Set;
 public class User {
     @Id
     @GeneratedValue
-    private Long Id;
+    private Long id;
 
     @Column
     private String username;
@@ -28,11 +28,11 @@ public class User {
     }
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Long id) {
-        Id = id;
+        this.id = id;
     }
 
     public String getPassword() {

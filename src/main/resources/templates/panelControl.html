@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8">
         <title>Вход</title>
@@ -8,6 +8,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
         <link rel="stylesheet" href = "/css/colors.css">
+        <script src = "/js/panel.js"></script>
     </head>
     <body>
     <div>
@@ -19,32 +20,37 @@
                         <a class="waves-effect waves-red btn-small green" href = "/panel/add"><i class="material-icons left">add</i>Добавить пользователя</a>
                     </li>
                 </ul>
-                <ul id = "chat" class="collection" th:each="user : ${users}">
-                    <li class="collection-item avatar" th:with="roles=${user.getRoleSet()}">
-                        <img src = "img/avatar_test.jpg" class="circle"/>
-                        <span class="title" th:text = "${user.username}">
-                        </span>
-                        <p th:if = "${user.active == false}">
-                            <i class="material-icons icon-red">brightness_1</i>
-                        </p>
-                        <p th:if = "${user.active == true}">
-                            <i class="material-icons icon-green">brightness_1</i>
-                        </p>
-                        <div th:if = "${isGod == true}" th:each = "role : ${roles}">
-                            <p th:text = "${role.getAuthority()}"></p>
-                        </div>
-                        <br>
-                        <a th:if = "${user.active == true}" class="waves-effect waves-red btn-small red" th:href="@{/panel/block/{name}(name = ${user.username})}"><i class="material-icons left">sentiment_very_dissatisfied</i>Заблокировать</a>
-                        <a th:if = "${user.active == false}" class="waves-effect waves-red btn-small green" th:href="@{/panel/unblock/{name}(name = ${user.username})}"><i class="material-icons left">sentiment_satisfied</i>Разблокировать</a>
+                <div>
+                    <ul th:id = "${user.username}" class="collection" th:each="user : ${users}">
+                        <li class="collection-item avatar" th:with="roles=${user.getRoleSet()}">
+                            <img src = "img/avatar_test.jpg" class="circle"/>
+                            <span class="title" th:text = "${user.username}">
+                            </span>
+                            <div th:switch = "${user.active}">
+                                <p th:case = "false">
+                                    <i class="material-icons icon-red">brightness_1</i>
+                                </p>
+                                <p th:case = "true">
+                                    <i class="material-icons icon-green">brightness_1</i>
+                                </p>
+                            </div>
+                            <div th:if = "${isSuperuser}" th:each = "role : ${roles}">
+                                <p th:text = "${role.getAuthority()}"></p>
+                            </div>
+                            <br>
+                            <span th:switch = "${user.active}">
+                                <a th:case = "true" class="waves-effect waves-red btn-small red" th:onclick = "'banUser(' + ${user.id} + ')'"><i class="material-icons left">sentiment_very_dissatisfied</i>Заблокировать</a>
+                                <a th:case = "false" class="waves-effect waves-red btn-small green" th:href="@{/panel/unblock/{name}(name = ${user.username})}"><i class="material-icons left">sentiment_satisfied</i>Разблокировать</a>
+                            </span>
+                            <span th:if = "${isSuperuser}">
+                                <a th:if = "${user.getSuperuser() == false}" class="waves-effect waves-green btn-small green" th:href="@{/panel/editRoles/{name}(name = ${user.username})}"><i class="material-icons left">group_add</i>Сделать модератором</a>
+                                <a th:if = "${user.getSuperuser() == true}" class="waves-effect waves-green btn-small red" th:href="@{/panel/deleteRoles/{name}(name = ${user.username})}"><i class="material-icons left">group_add</i>Убрать из модераторов</a>
+                            </span>
 
-                        <span th:if = "${isGod == true}">
-                            <a th:if = "${user.getGod() == false}" class="waves-effect waves-green btn-small green" th:href="@{/panel/editRoles/{name}(name = ${user.username})}"><i class="material-icons left">group_add</i>Сделать модератором</a>
-                            <a th:if = "${user.getGod() == true}" class="waves-effect waves-green btn-small red" th:href="@{/panel/deleteRoles/{name}(name = ${user.username})}"><i class="material-icons left">group_add</i>Убрать из модераторов</a>
-                        </span>
-
-                        <a th:if = "${isGod == true}" th:href="@{/panel/delete/{name}(name = ${user.username})}" class="secondary-content"><i class="small material-icons icon-red">delete</i></a>
-                    </li>
-                </ul>
+                            <a th:if = "${isGod == true}" th:href="@{/panel/delete/{name}(name = ${user.username})}" class="secondary-content"><i class="small material-icons icon-red">delete</i></a>
+                        </li>
+                    </ul>
+                </div>
                 <a class="waves-effect waves-light btn-large" href = "/messages"><i class="material-icons left">chevron_left</i>Назад</a>
             </div>
         </div>

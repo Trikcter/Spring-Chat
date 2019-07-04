@@ -5,7 +5,7 @@
    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
 
     <!-- Tables -->
-    <changeSet author="Bolgov" id="FirstVersion">
+    <changeSet author="Bolgov" id="Bolgov-1" failOnError="false">
         <createTable tableName="user_role">
             <column name="user_id" type="bigint" autoIncrement="true" />
             <column name="roles" type="varchar(255)"/>

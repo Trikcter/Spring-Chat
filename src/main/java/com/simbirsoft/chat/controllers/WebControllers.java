@@ -22,18 +22,18 @@ public class WebControllers {
     public String chat(Authentication authentication, Model model) {
 
         String username = authentication.getName();
-        Boolean isGod = false;
+        boolean isSuperuser = false;
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         for (GrantedAuthority grantedAuthority : authorities) {
-            if ((grantedAuthority.getAuthority().equals("ROLE_ADMIN")) | (grantedAuthority.getAuthority().equals("ROLE_MODERATOR")) | grantedAuthority.getAuthority().equals("MODERATOR")) {
-                isGod = true;
+            if ((grantedAuthority.getAuthority().equals("ROLE_ADMIN")) || (grantedAuthority.getAuthority().equals("ROLE_MODERATOR"))) {
+                isSuperuser = true;
                 break;
             }
         }
 
         model.addAttribute("username", username);
-        model.addAttribute("isGod", isGod);
+        model.addAttribute("isSuperuser", isSuperuser);
 
         return "messages";
     }

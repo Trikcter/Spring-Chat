@@ -29,9 +29,9 @@ sock.onmessage = function(e) {
     a.className += "secondary-content";
     a.onclick = function(){
         var xmlHttp = new XMLHttpRequest();
-        var url = "/panel/delmes/" + id;
+        var url = "/panel/messages/" + id;
 
-        xmlHttp.open( "GET", url, true );
+        xmlHttp.open( "DELETE", url, true );
         xmlHttp.send( null );
 
         document.getElementById(id).remove();

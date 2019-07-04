@@ -8,7 +8,7 @@ import java.util.List;
 public interface UserService {
     void addUser(UserDTO user);
 
-    void delete(String username);
+    void delete(Long id);
 
     User getByUsername(String username);
 
@@ -18,11 +18,11 @@ public interface UserService {
 
     User save(User user);
 
-    void makeModerator(String username);
+    void makeModerator(Long id);
 
-    void removeModerator(String username);
+    void removeModerator(Long id);
 
-    void blockUser(String username);
+    void blockUser(Long id);
 
-    void unBlockUser(String username);
+    void unblockUser(Long id);
 }

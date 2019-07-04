@@ -5,10 +5,11 @@ import com.simbirsoft.chat.entity.Role;
 import java.util.List;
 
 public class UserDTO {
+    private Long id;
     private String username;
     private Boolean active;
     private List<Role> roleSet;
-    private Boolean isGod = false;
+    private Boolean isSuperuser = false;
 
     public String getUsername() {
         return username;
@@ -35,16 +36,24 @@ public class UserDTO {
 
         for(Role role:roleSet){
             if((role.getAuthority() == "MODERATOR") | (role.getAuthority() == "ADMIN")){
-                isGod = true;
+                isSuperuser = true;
             }
         }
     }
 
-    public Boolean getGod() {
-        return isGod;
+    public Long getId() {
+        return id;
     }
 
-    public void setGod(Boolean god) {
-        isGod = god;
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Boolean getSuperuser() {
+        return isSuperuser;
+    }
+
+    public void setSuperuser(Boolean superuser) {
+        isSuperuser = superuser;
     }
 }
