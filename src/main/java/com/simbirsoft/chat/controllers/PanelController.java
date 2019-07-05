@@ -1,5 +1,6 @@
 package com.simbirsoft.chat.controllers;
 
+import com.simbirsoft.chat.model.GenericRS;
 import com.simbirsoft.chat.model.UserDTO;
 import com.simbirsoft.chat.service.MessageService;
 import com.simbirsoft.chat.service.UserService;
@@ -45,33 +46,33 @@ public class PanelController {
     }
 
     @DeleteMapping("/{id}")
-    public String deleteUser(@PathVariable Long id){
+    @ResponseStatus(value = HttpStatus.OK)
+    public void deleteUser(@PathVariable Long id){
         userService.delete(id);
-        return "redirect:/panel";
     }
 
     @GetMapping("/block/{id}")
-    public String blockUser(@PathVariable Long id){
+    @ResponseStatus(value = HttpStatus.OK)
+    public void blockUser(@PathVariable Long id){
         userService.blockUser(id);
-        return "redirect:/panel";
     }
 
-    @GetMapping("/unblock/{username}")
-    public String unblockUser(@PathVariable Long id){
+    @GetMapping("/unblock/{id}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void unblockUser(@PathVariable Long id){
         userService.unblockUser(id);
-        return "redirect:/panel";
     }
 
-    @GetMapping("/roles/{username}")
-    public String setModerator(@PathVariable Long id){
+    @GetMapping("/roles/{id}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void setModerator(@PathVariable Long id){
         userService.makeModerator(id);
-        return "redirect:/panel";
     }
 
-    @DeleteMapping("/roles/{username}")
-    public String removeModerator(@PathVariable Long id){
+    @DeleteMapping("/roles/{id}")
+    @ResponseStatus(value = HttpStatus.OK)
+    public void removeModerator(@PathVariable Long id){
         userService.removeModerator(id);
-        return "redirect:/panel";
     }
 
     @GetMapping("/add")

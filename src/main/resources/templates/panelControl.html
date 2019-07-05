@@ -21,17 +21,17 @@
                     </li>
                 </ul>
                 <div>
-                    <ul th:id = "${user.username}" class="collection" th:each="user : ${users}">
+                    <ul th:id = "${user.id}" class="collection" th:each="user : ${users}">
                         <li class="collection-item avatar" th:with="roles=${user.getRoleSet()}">
                             <img src = "img/avatar_test.jpg" class="circle"/>
                             <span class="title" th:text = "${user.username}">
                             </span>
                             <div th:switch = "${user.active}">
                                 <p th:case = "false">
-                                    <i class="material-icons icon-red">brightness_1</i>
+                                    <i class="material-icons icon-red active_color">brightness_1</i>
                                 </p>
                                 <p th:case = "true">
-                                    <i class="material-icons icon-green">brightness_1</i>
+                                    <i class="material-icons icon-green active_color">brightness_1</i>
                                 </p>
                             </div>
                             <div th:if = "${isSuperuser}" th:each = "role : ${roles}">
@@ -40,14 +40,13 @@
                             <br>
                             <span th:switch = "${user.active}">
                                 <a th:case = "true" class="waves-effect waves-red btn-small red" th:onclick = "'banUser(' + ${user.id} + ')'"><i class="material-icons left">sentiment_very_dissatisfied</i>Заблокировать</a>
-                                <a th:case = "false" class="waves-effect waves-red btn-small green" th:href="@{/panel/unblock/{name}(name = ${user.username})}"><i class="material-icons left">sentiment_satisfied</i>Разблокировать</a>
+                                <a th:case = "false" class="waves-effect waves-red btn-small green" th:onclick = "'unBanUser(' + ${user.id} + ')'"><i class="material-icons left">sentiment_satisfied</i>Разблокировать</a>
                             </span>
                             <span th:if = "${isSuperuser}">
-                                <a th:if = "${user.getSuperuser() == false}" class="waves-effect waves-green btn-small green" th:href="@{/panel/editRoles/{name}(name = ${user.username})}"><i class="material-icons left">group_add</i>Сделать модератором</a>
-                                <a th:if = "${user.getSuperuser() == true}" class="waves-effect waves-green btn-small red" th:href="@{/panel/deleteRoles/{name}(name = ${user.username})}"><i class="material-icons left">group_add</i>Убрать из модераторов</a>
+                                <a th:if = "${user.getSuperuser() == false}" class="waves-effect waves-green btn-small green" th:onclick = "'makeSuperuser(' + ${user.id} + ')'"><i class="material-icons left">group_add</i>Сделать модератором</a>
+                                <a th:if = "${user.getSuperuser() == true}" class="waves-effect waves-green btn-small red" th:onclick = "'makeSimpleUser(' + ${user.id} + ')'"><i class="material-icons left">group_add</i>Убрать из модераторов</a>
                             </span>
-
-                            <a th:if = "${isGod == true}" th:href="@{/panel/delete/{name}(name = ${user.username})}" class="secondary-content"><i class="small material-icons icon-red">delete</i></a>
+                            <button th:if = "${isSuperuser}" class="secondary-content unvisible" th:onclick = "'deleteUser(' + ${user.id} + ')'"><i class="small material-icons icon-red">delete</i></button>
                         </li>
                     </ul>
                 </div>
