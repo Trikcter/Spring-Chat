@@ -35,7 +35,7 @@ public class UserDTO {
         this.roleSet = roleSet;
 
         for(Role role:roleSet){
-            if((role.getAuthority() == "MODERATOR") | (role.getAuthority() == "ADMIN")){
+            if(("MODERATOR".equals(role.getAuthority())) || ("ADMIN".equals(role.getAuthority()))){
                 isSuperuser = true;
             }
         }

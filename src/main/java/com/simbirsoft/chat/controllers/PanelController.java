@@ -5,7 +5,6 @@ import com.simbirsoft.chat.model.UserDTO;
 import com.simbirsoft.chat.service.MessageService;
 import com.simbirsoft.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -46,33 +45,38 @@ public class PanelController {
     }
 
     @DeleteMapping("/{id}")
-    @ResponseStatus(value = HttpStatus.OK)
-    public void deleteUser(@PathVariable Long id){
+    @ResponseBody
+    public GenericRS deleteUser(@PathVariable Long id){
         userService.delete(id);
+        return new GenericRS();
     }
 
     @GetMapping("/block/{id}")
-    @ResponseStatus(value = HttpStatus.OK)
-    public void blockUser(@PathVariable Long id){
+    @ResponseBody
+    public GenericRS blockUser(@PathVariable Long id){
         userService.blockUser(id);
+        return new GenericRS();
     }
 
     @GetMapping("/unblock/{id}")
-    @ResponseStatus(value = HttpStatus.OK)
-    public void unblockUser(@PathVariable Long id){
+    @ResponseBody
+    public GenericRS unblockUser(@PathVariable Long id){
         userService.unblockUser(id);
+        return new GenericRS();
     }
 
     @GetMapping("/roles/{id}")
-    @ResponseStatus(value = HttpStatus.OK)
-    public void setModerator(@PathVariable Long id){
+    @ResponseBody
+    public GenericRS setModerator(@PathVariable Long id){
         userService.makeModerator(id);
+        return new GenericRS();
     }
 
     @DeleteMapping("/roles/{id}")
-    @ResponseStatus(value = HttpStatus.OK)
-    public void removeModerator(@PathVariable Long id){
+    @ResponseBody
+    public GenericRS removeModerator(@PathVariable Long id){
         userService.removeModerator(id);
+        return new GenericRS();
     }
 
     @GetMapping("/add")
@@ -87,8 +91,9 @@ public class PanelController {
     }
 
     @DeleteMapping("/messages/{id}")
-    @ResponseStatus(value = HttpStatus.OK)
-    public void deleteMessage(@PathVariable Long id){
+    @ResponseBody
+    public GenericRS deleteMessage(@PathVariable Long id){
         messageService.delete(id);
+        return new GenericRS();
     }
 }

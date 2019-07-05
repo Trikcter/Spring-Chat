@@ -16,9 +16,11 @@ public class MessageServiceImpl implements MessageService {
     private MessageRepository messageRepository;
 
     @Override
-    public Message save(Message message) {
+    public Optional<Message> save(Message message) {
         Message msg = messageRepository.save(message);
-        return msg;
+        Optional<Message> optionalMessage = Optional.of(msg);
+
+        return optionalMessage;
     }
 
     @Override

@@ -5,9 +5,51 @@ sock.onopen = function() {
 };
 
 sock.onmessage = function(e) {
-    var words = e.data.split(":");
-    var id = words[0];
+    var answer = e.data;
 
+    var words = JSON.parse(answer);
+
+    var type = words.typeOfMessage;
+
+    switch(type){
+        case "text":
+            drawMessage(words.id,words.username,words.message);
+            break;
+        case "command":
+            performCMD(words.message)
+            break;
+    }
+};
+
+sock.onclose = function() {
+    console.log('close');
+};
+
+function onClose(){
+    sock.close();
+    alert("Вы вышли из чата!");
+}
+
+function sendMessage(){
+    var element = document.getElementById("message");
+    var username = document.getElementById("username").innerText;
+
+    var payload = element.value;
+
+    var msg = {
+        "username":username,
+        "message":payload
+    }
+
+    var message = JSON.stringify(msg);
+
+    if(element.value != "")
+        sock.send(message);
+
+    element.value = "";
+}
+
+function drawMessage(id,username,payload){
     var messages = document.getElementById("chat");
 
     var messageElement = document.createElement('li');
@@ -16,10 +58,10 @@ sock.onmessage = function(e) {
 
     var spanElement = document.createElement("span");
     spanElement.className += " title";
-    spanElement.appendChild(document.createTextNode(words[1] + " отправил:"));
+    spanElement.appendChild(document.createTextNode(username + " отправил:"));
 
     var textnode = document.createElement("p");
-    textnode.appendChild(document.createTextNode(words[2]));
+    textnode.appendChild(document.createTextNode(payload));
 
     var img = document.createElement("img");
     img.className += "circle";
@@ -49,23 +91,26 @@ sock.onmessage = function(e) {
     messageElement.appendChild(a);
 
     messages.appendChild(messageElement);
-};
-
-sock.onclose = function() {
-    console.log('close');
-};
-
-function onClose(){
-    sock.close();
-    alert("Вы вышли из чата!");
 }
 
-function sendMessage(){
-    var message = document.getElementById("message");
-    var username = document.getElementById("username").innerText;
+function performCMD(command){
+    var cmd = command.split(" ");
+    var url = "";
 
-    if(message.value != "")
-        sock.send(username + ":" + message.value);
+    for(i = 0; i < cmd.length; i++){
+        url += cmd[i] + "/"
+    }
 
-    message.value = "";
+    var xmlHttp = new XMLHttpRequest();
+
+    xmlHttp.open( "GET", url, false );
+    xmlHttp.send( null );
+
+    var answer = xmlHttp.responseText;
+
+    if(answer != null){
+        var username = document.getElementById("username")
+        username.innerText = answer;
+        alert("Имя было изменено!");
+    }
 }

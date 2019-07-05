@@ -1,6 +1,9 @@
 package com.simbirsoft.chat.websocket;
 
+import com.google.gson.Gson;
+import com.simbirsoft.chat.MessageNotSaveException;
 import com.simbirsoft.chat.entity.Message;
+import com.simbirsoft.chat.model.MessageDTO;
 import com.simbirsoft.chat.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.*;
@@ -11,6 +14,7 @@ import java.util.Set;
 public class ChatWebSocketHandler implements WebSocketHandler {
 
     private Set<WebSocketSession> sessions = new HashSet<>();
+    private Set<String> users = new HashSet<>();
 
     @Autowired
     MessageService messageService;
@@ -22,12 +26,36 @@ public class ChatWebSocketHandler implements WebSocketHandler {
 
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
+        Gson g = new Gson();
         for (WebSocketSession session : sessions) {
-            String[] mes = webSocketMessage.getPayload().toString().split(":");
-            Message message = new Message(mes[0], mes[1]);
-            Message send = messageService.save(message);
+            Message message = g.fromJson(webSocketMessage.getPayload().toString(), Message.class);
 
-            session.sendMessage(new TextMessage(message.getSocketMessage()));
+            messageService.save(message).orElseThrow(() -> new MessageNotSaveException("Ошибка сохранения в БД"));
+
+            String text = message.getMessage();
+            String username = message.getUsername();
+            Long id = message.getId();
+
+            MessageDTO frontMessage = new MessageDTO();
+
+            frontMessage.setUsername(username);
+            frontMessage.setId(id);
+
+            if(text.contains("//")){
+                StringBuilder command = new StringBuilder(text);
+                command.delete(0,2);
+                text = command.toString();
+
+                frontMessage.setMessage(text);
+                frontMessage.setTypeOfMessage("command");
+            }else{
+                frontMessage.setMessage(text);
+                frontMessage.setTypeOfMessage("text");
+            }
+
+            String json = g.toJson(frontMessage);
+
+            session.sendMessage(new TextMessage(json));
         }
     }
 

@@ -7,7 +7,7 @@ import javax.persistence.*;
 public class Message {
     @Id
     @GeneratedValue
-    private Long Id;
+    private Long id;
 
     @Column
     private String username;
@@ -32,11 +32,11 @@ public class Message {
     }
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Long id) {
-        this.Id = id;
+        this.id = id;
     }
 
     public Message(String username, String message) {
@@ -47,7 +47,4 @@ public class Message {
     public Message() {
     }
 
-    public String getSocketMessage() {
-        return Id.toString() + ":" + username + ":" + message;
-    }
 }

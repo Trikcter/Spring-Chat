@@ -58,8 +58,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User editUser(User user) {
-        return null;
+    public User editUser(String currentName, String futureName) {
+        User user = userRepository.findByUsername(currentName).orElse(new User());
+
+        user.setUsername(futureName);
+
+        return userRepository.save(user);
     }
 
     /**
