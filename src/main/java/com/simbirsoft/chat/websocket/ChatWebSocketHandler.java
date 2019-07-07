@@ -27,35 +27,39 @@ public class ChatWebSocketHandler implements WebSocketHandler {
     @Override
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
         Gson g = new Gson();
-        for (WebSocketSession session : sessions) {
-            Message message = g.fromJson(webSocketMessage.getPayload().toString(), Message.class);
 
-            messageService.save(message).orElseThrow(() -> new MessageNotSaveException("Ошибка сохранения в БД"));
+        Message message = g.fromJson(webSocketMessage.getPayload().toString(), Message.class);
 
-            String text = message.getMessage();
-            String username = message.getUsername();
-            Long id = message.getId();
+        messageService.save(message).orElseThrow(() -> new MessageNotSaveException("Ошибка сохранения в БД"));
 
-            MessageDTO frontMessage = new MessageDTO();
+        String text = message.getMessage();
+        String username = message.getUsername();
+        Long id = message.getId();
 
-            frontMessage.setUsername(username);
-            frontMessage.setId(id);
+        MessageDTO frontMessage = new MessageDTO();
 
-            if(text.contains("//")){
-                StringBuilder command = new StringBuilder(text);
-                command.delete(0,2);
-                text = command.toString();
+        frontMessage.setUsername(username);
+        frontMessage.setId(id);
 
-                frontMessage.setMessage(text);
-                frontMessage.setTypeOfMessage("command");
-            }else{
-                frontMessage.setMessage(text);
-                frontMessage.setTypeOfMessage("text");
-            }
+        if(text.contains("//")){
+            StringBuilder command = new StringBuilder(text);
+            command.delete(0,2);
+            text = command.toString();
+
+            frontMessage.setMessage(text);
+            frontMessage.setTypeOfMessage("command");
 
             String json = g.toJson(frontMessage);
 
-            session.sendMessage(new TextMessage(json));
+            webSocketSession.sendMessage(new TextMessage(json));
+        }else{
+            frontMessage.setMessage(text);
+            frontMessage.setTypeOfMessage("text");
+            String json = g.toJson(frontMessage);
+
+            for (WebSocketSession session : sessions) {
+                session.sendMessage(new TextMessage(json));
+            }
         }
     }
 

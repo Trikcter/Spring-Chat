@@ -2,6 +2,16 @@ var sock = new SockJS('/chat');
 
 sock.onopen = function() {
     console.log('open');
+
+    /*var username = document.getElementById("username").innerText;
+
+    var msg = {
+        "username":username,
+        "type": "greetings"
+    }
+
+    var message = JSON.stringify(msg);
+    sock.send(message);*/
 };
 
 sock.onmessage = function(e) {
