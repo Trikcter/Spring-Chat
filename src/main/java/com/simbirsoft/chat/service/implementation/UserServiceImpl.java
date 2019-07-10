@@ -9,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Bolgov
@@ -53,8 +50,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getByUsername(String username) {
-        return null;
+    public Optional<User> getByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
     @Override

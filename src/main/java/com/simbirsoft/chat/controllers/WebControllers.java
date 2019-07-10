@@ -55,7 +55,7 @@ public class WebControllers {
 
     @PostMapping("/registration")
     public String addUser(User user) {
-        User userFromDB = userService.getByUsername(user.getUsername());
+        User userFromDB = userService.getByUsername(user.getUsername()).orElse(new User());
 
         if (userFromDB != null) {
             return "registration";

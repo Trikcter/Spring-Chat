@@ -1,8 +1,16 @@
 package com.simbirsoft.chat.model;
 
-public class GenericRS {
+public class GenericRs {
     private String status;
     private String[] message;
+
+    public GenericRs(String status, String[] message) {
+        this.status = status;
+        this.message = message;
+    }
+
+    public GenericRs() {
+    }
 
     public String getStatus() {
         return status;

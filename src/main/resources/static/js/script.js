@@ -25,8 +25,14 @@ sock.onmessage = function(e) {
         case "text":
             drawMessage(words.id,words.username,words.message);
             break;
-        case "command":
-            performCMD(words.message)
+        case "Error":
+            alert(words.message);
+            break;
+        case "Rename":
+            rename(words.message);
+            break;
+        case "Ban":
+            alert(words.message);
             break;
     }
 };
@@ -103,24 +109,8 @@ function drawMessage(id,username,payload){
     messages.appendChild(messageElement);
 }
 
-function performCMD(command){
-    var cmd = command.split(" ");
-    var url = "";
-
-    for(i = 0; i < cmd.length; i++){
-        url += cmd[i] + "/"
-    }
-
-    var xmlHttp = new XMLHttpRequest();
-
-    xmlHttp.open( "GET", url, false );
-    xmlHttp.send( null );
-
-    var answer = xmlHttp.responseText;
-
-    if(answer != null){
-        var username = document.getElementById("username")
-        username.innerText = answer;
-        alert("Имя было изменено!");
-    }
+function rename(newName){
+    var username = document.getElementById("username")
+    username.innerText = newName;
+    alert("Имя было изменено!");
 }

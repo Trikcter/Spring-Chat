@@ -1,4 +1,4 @@
-package com.simbirsoft.chat;
+package com.simbirsoft.chat.exceptions;
 
 public class MessageNotSaveException extends Exception {
     public MessageNotSaveException(String message) {

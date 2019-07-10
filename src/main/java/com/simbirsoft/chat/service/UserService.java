@@ -4,13 +4,14 @@ import com.simbirsoft.chat.entity.User;
 import com.simbirsoft.chat.model.UserDTO;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
     void addUser(UserDTO user);
 
     void delete(Long id);
 
-    User getByUsername(String username);
+    Optional<User> getByUsername(String username);
 
     User editUser(String currentName, String futureName);
 

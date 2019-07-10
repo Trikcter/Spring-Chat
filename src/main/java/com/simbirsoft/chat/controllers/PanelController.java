@@ -1,6 +1,6 @@
 package com.simbirsoft.chat.controllers;
 
-import com.simbirsoft.chat.model.GenericRS;
+import com.simbirsoft.chat.model.GenericRs;
 import com.simbirsoft.chat.model.UserDTO;
 import com.simbirsoft.chat.service.MessageService;
 import com.simbirsoft.chat.service.UserService;
@@ -46,37 +46,37 @@ public class PanelController {
 
     @DeleteMapping("/{id}")
     @ResponseBody
-    public GenericRS deleteUser(@PathVariable Long id){
+    public GenericRs deleteUser(@PathVariable Long id){
         userService.delete(id);
-        return new GenericRS();
+        return new GenericRs();
     }
 
     @GetMapping("/block/{id}")
     @ResponseBody
-    public GenericRS blockUser(@PathVariable Long id){
+    public GenericRs blockUser(@PathVariable Long id){
         userService.blockUser(id);
-        return new GenericRS();
+        return new GenericRs();
     }
 
     @GetMapping("/unblock/{id}")
     @ResponseBody
-    public GenericRS unblockUser(@PathVariable Long id){
+    public GenericRs unblockUser(@PathVariable Long id){
         userService.unblockUser(id);
-        return new GenericRS();
+        return new GenericRs();
     }
 
     @GetMapping("/roles/{id}")
     @ResponseBody
-    public GenericRS setModerator(@PathVariable Long id){
+    public GenericRs setModerator(@PathVariable Long id){
         userService.makeModerator(id);
-        return new GenericRS();
+        return new GenericRs();
     }
 
     @DeleteMapping("/roles/{id}")
     @ResponseBody
-    public GenericRS removeModerator(@PathVariable Long id){
+    public GenericRs removeModerator(@PathVariable Long id){
         userService.removeModerator(id);
-        return new GenericRS();
+        return new GenericRs();
     }
 
     @GetMapping("/add")
@@ -92,8 +92,8 @@ public class PanelController {
 
     @DeleteMapping("/messages/{id}")
     @ResponseBody
-    public GenericRS deleteMessage(@PathVariable Long id){
+    public GenericRs deleteMessage(@PathVariable Long id){
         messageService.delete(id);
-        return new GenericRS();
+        return new GenericRs();
     }
 }
