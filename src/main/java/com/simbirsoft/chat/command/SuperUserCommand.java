@@ -25,7 +25,9 @@ public class SuperUserCommand implements BasicCommand {
             return new GenericRs("Error", new String[]{messageSource.getMessage("error.commandNotFound",new Object[0],new Locale("ru"))});
         }
 
-        if(!("Admin".equals(username))){
+        User requestUser = userService.getByUsername(username).orElse(new User());
+
+        if(!(requestUser.getRoles().contains(Role.ADMIN))){
             return new GenericRs("Error", new String[]{messageSource.getMessage("error.notSuperuser",new Object[0],new Locale("ru"))});
         }
 

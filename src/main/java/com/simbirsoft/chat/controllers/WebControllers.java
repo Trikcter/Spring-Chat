@@ -1,6 +1,8 @@
 package com.simbirsoft.chat.controllers;
 
+import com.simbirsoft.chat.entity.Room;
 import com.simbirsoft.chat.entity.User;
+import com.simbirsoft.chat.service.RoomService;
 import com.simbirsoft.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -11,12 +13,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 public class WebControllers {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private RoomService roomService;
 
     @GetMapping(path = "/messages")
     public String chat(Authentication authentication, Model model) {
@@ -26,14 +32,17 @@ public class WebControllers {
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         for (GrantedAuthority grantedAuthority : authorities) {
-            if ((grantedAuthority.getAuthority().equals("ROLE_ADMIN")) || (grantedAuthority.getAuthority().equals("ROLE_MODERATOR"))) {
+            if ((grantedAuthority.getAuthority().equals("ADMIN")) || (grantedAuthority.getAuthority().equals("MODERATOR"))) {
                 isSuperuser = true;
                 break;
             }
         }
 
+        List<Room> rooms = roomService.getRoomsByUsername(username);
+
         model.addAttribute("username", username);
         model.addAttribute("isSuperuser", isSuperuser);
+        model.addAttribute("rooms",rooms);
 
         return "messages";
     }
@@ -55,9 +64,9 @@ public class WebControllers {
 
     @PostMapping("/registration")
     public String addUser(User user) {
-        User userFromDB = userService.getByUsername(user.getUsername()).orElse(new User());
+        Optional<User> userFromDB = userService.getByUsername(user.getUsername());
 
-        if (userFromDB != null) {
+        if (userFromDB.isPresent()) {
             return "registration";
         }
 

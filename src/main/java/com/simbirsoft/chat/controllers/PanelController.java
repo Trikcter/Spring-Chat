@@ -15,9 +15,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collection;
 import java.util.List;
 
+// TODO : Сделать адекватную проверку на роль Администратора, что бы его не выводило
+// TODO Не работает вывод прав пользователя, надо сделать реактивно
+
 @Controller
 @RequestMapping("/panel")
-@PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_MODERATOR')")
+@PreAuthorize("hasAuthority('ADMIN') or hasAuthority('MODERATOR')")
 public class PanelController {
     @Autowired
     private UserService userService;
@@ -32,7 +35,7 @@ public class PanelController {
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         for (GrantedAuthority grantedAuthority : authorities) {
-            if (grantedAuthority.getAuthority().equals("ROLE_ADMIN")) {
+            if (grantedAuthority.getAuthority().equals("ADMIN")) {
                 isSuperuser = true;
                 break;
             }

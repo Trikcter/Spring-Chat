@@ -1,12 +1,14 @@
 package com.simbirsoft.chat.websocket;
 
 import com.google.gson.Gson;
+import com.simbirsoft.chat.entity.User;
 import com.simbirsoft.chat.exceptions.MessageNotSaveException;
 import com.simbirsoft.chat.entity.Message;
 import com.simbirsoft.chat.model.GenericRs;
 import com.simbirsoft.chat.model.MessageDTO;
 import com.simbirsoft.chat.service.CommandService;
 import com.simbirsoft.chat.service.MessageService;
+import com.simbirsoft.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.socket.*;
 
@@ -20,7 +22,7 @@ public class ChatWebSocketHandler implements WebSocketHandler {
 
     private MessageDTO getUIMessage(Message message){
         String text = message.getMessage();
-        String username = message.getUsername();
+        String username = message.getAuthor().getUsername();
         Long id = message.getId();
 
         MessageDTO frontMessage = new MessageDTO();
@@ -45,10 +47,26 @@ public class ChatWebSocketHandler implements WebSocketHandler {
         return frontMessage;
     }
 
+    private Message saveMessage(MessageDTO messageDTO) throws MessageNotSaveException {
+
+        Message message = new Message();
+
+        message.setMessage(messageDTO.getMessage());
+
+        User saveUser = userService.getByUsername(messageDTO.getUsername()).orElse(new User());
+        message.setAuthor(saveUser);
+
+        Message messageReturn = messageService.save(message).orElseThrow(() -> new MessageNotSaveException("Ошибка сохранения в БД"));
+
+        return messageReturn;
+    }
+
     @Autowired
     private MessageService messageService;
     @Autowired
     private CommandService commandService;
+    @Autowired
+    private UserService userService;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession webSocketSession) throws Exception {
@@ -59,9 +77,9 @@ public class ChatWebSocketHandler implements WebSocketHandler {
     public void handleMessage(WebSocketSession webSocketSession, WebSocketMessage<?> webSocketMessage) throws Exception {
         Gson g = new Gson();
 
-        Message message = g.fromJson(webSocketMessage.getPayload().toString(), Message.class);
+        MessageDTO messageDTO = g.fromJson(webSocketMessage.getPayload().toString(), MessageDTO.class);
 
-        messageService.save(message).orElseThrow(() -> new MessageNotSaveException("Ошибка сохранения в БД"));
+        Message message = saveMessage(messageDTO);
 
         MessageDTO frontMessage = getUIMessage(message);
 

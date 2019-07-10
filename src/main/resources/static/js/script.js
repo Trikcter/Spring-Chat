@@ -31,7 +31,7 @@ sock.onmessage = function(e) {
         case "Rename":
             rename(words.message);
             break;
-        case "Ban":
+        case "Ok":
             alert(words.message);
             break;
     }

@@ -1,5 +1,6 @@
 package com.simbirsoft.chat.command;
 
+import com.simbirsoft.chat.entity.Role;
 import com.simbirsoft.chat.entity.User;
 import com.simbirsoft.chat.model.CommandAttribute;
 import com.simbirsoft.chat.model.GenericRs;
@@ -24,7 +25,9 @@ public class BanCommand implements BasicCommand {
             return new GenericRs("Error", new String[]{messageSource.getMessage("error.commandNotFound",new Object[0],new Locale("ru"))});
         }
 
-        if(!("Admin".equals(username))){
+        User requestUser = userService.getByUsername(username).orElse(new User());
+
+        if(!(requestUser.getRoles().contains(Role.MODERATOR) || requestUser.getRoles().contains(Role.ADMIN))){
             return new GenericRs("Error", new String[]{messageSource.getMessage("error.notSuperuser",new Object[0],new Locale("ru"))});
         }
 
@@ -42,6 +45,6 @@ public class BanCommand implements BasicCommand {
 
         userService.blockUser(user.getId());
 
-        return new GenericRs("Ban", new String[]{"Пользователь был забанен!"});
+        return new GenericRs("Ok", new String[]{"Пользователь был забанен!"});
     }
 }

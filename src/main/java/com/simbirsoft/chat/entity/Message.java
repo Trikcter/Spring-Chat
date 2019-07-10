@@ -9,19 +9,12 @@ public class Message {
     @GeneratedValue
     private Long id;
 
-    @Column
-    private String username;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User author;
 
     @Column
     private String message;
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
 
     public String getMessage() {
         return message;
@@ -39,8 +32,16 @@ public class Message {
         this.id = id;
     }
 
-    public Message(String username, String message) {
-        this.username = username;
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
+    }
+
+    public Message(User author, String message) {
+        this.author = author;
         this.message = message;
     }
 
