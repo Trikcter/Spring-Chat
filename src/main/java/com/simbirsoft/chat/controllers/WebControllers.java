@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Controller
 public class WebControllers {
@@ -38,7 +38,7 @@ public class WebControllers {
             }
         }
 
-        List<Room> rooms = roomService.getRoomsByUsername(username);
+        Set<Room> rooms = roomService.getRoomsByUsername(username);
 
         model.addAttribute("username", username);
         model.addAttribute("isSuperuser", isSuperuser);

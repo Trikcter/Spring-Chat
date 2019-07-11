@@ -8,9 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 import java.util.Optional;
 
-public interface RoomRepository extends JpaRepository<Room,Long> {
+public interface RoomRepository extends JpaRepository<Room, Long> {
     Optional<Room> findByName(String name);
-    /*@Query("Select * from room where is_locked = false")
-    List<Room> findByNameNonLocked(String name);*/
+
     List<Room> findRoomByOwner(User user);
+
+    List<Room> findRoomByIsLocked(Boolean isLocked);
+
+    List<Room> findRoomByParticipants(User user);
+
 }

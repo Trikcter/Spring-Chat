@@ -6,6 +6,7 @@ import com.simbirsoft.chat.entity.User;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface RoomService {
     Room addRoom(Room room);
@@ -14,11 +15,11 @@ public interface RoomService {
 
     void addMessage(Message message);
 
-    void addParticipants(User user);
+    void addParticipants(User user,Room room);
 
     Optional<Room> getRoomByName(String name);
 
     void edit(Room room);
 
-    List<Room> getRoomsByUsername(String username);
+    Set<Room> getRoomsByUsername(String username);
 }

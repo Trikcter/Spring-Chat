@@ -9,9 +9,7 @@ import com.simbirsoft.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class RoomServiceImpl implements RoomService {
@@ -36,8 +34,14 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public void addParticipants(User user) {
+    public void addParticipants(User user, Room room) {
+        Set<User> users = room.getParticipants();
 
+        users.add(user);
+
+        room.setParticipants(users);
+
+        roomRepository.save(room);
     }
 
     @Override
@@ -51,13 +55,21 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public List<Room> getRoomsByUsername(String username) {
-        List<Room> rooms = new ArrayList<>();
+    public Set<Room> getRoomsByUsername(String username) {
+        Set<Room> roomSet = new HashSet<>();
 
         User user = userService.getByUsername(username).orElse(new User());
 
-        rooms = roomRepository.findRoomByOwner(user);
+        List<Room> rooms = roomRepository.findRoomByOwner(user);
 
-        return rooms;
+        List<Room> openRooms = roomRepository.findRoomByIsLocked(false);
+
+        List<Room> participantRooms = roomRepository.findRoomByParticipants(user);
+
+        roomSet.addAll(rooms);
+        roomSet.addAll(openRooms);
+        roomSet.addAll(participantRooms);
+
+        return roomSet;
     }
 }
