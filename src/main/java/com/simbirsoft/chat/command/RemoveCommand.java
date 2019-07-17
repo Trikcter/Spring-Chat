@@ -24,31 +24,36 @@ public class RemoveCommand implements BasicCommand {
     private UserService userService;
 
     @Override
-    public GenericRs executeCommand(CommandAttribute command, String username) {
+    public GenericRs executeCommand(CommandAttribute command, User user) {
         if (!("room".equals(command.getCommands()[0]))) {
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.commandNotFound", new Object[0], new Locale("ru"))});
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.commandNotFound", new Object[0], Locale.getDefault())});
         }
 
-        User owner = userService.getByUsername(username).orElse(new User());
+        User owner = user;
 
-        if(command.getCommands().length > 3 && command.getCommands()[2] == ""){
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.undefinedName", new Object[0], new Locale("ru"))});
+        if (command.getCommands().length > 3 && command.getCommands()[2] == "") {
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.undefinedName", new Object[0], Locale.getDefault())});
         }
 
         Optional<Room> rmRoom = roomService.getRoomByName(command.getCommands()[2]);
 
-        if(!(rmRoom.isPresent())){
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.nonExistName", new Object[0], new Locale("ru"))});
+        if (!(rmRoom.isPresent())) {
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.nonExistName", new Object[0], Locale.getDefault())});
         }
 
         Room room = rmRoom.get();
 
-        if(room.getOwner().getId() != owner.getId() && !(owner.getRoles().contains(Role.ADMIN))){
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.notOwner", new Object[0], new Locale("ru"))});
+        if (room.getOwner().getId() != owner.getId() && !(owner.getRoles().contains(Role.ADMIN))) {
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.notOwner", new Object[0], Locale.getDefault())});
         }
 
         roomService.delete(room);
 
-        return new GenericRs("Ok", new String[]{"Комната была успешно удалена!"});
+        return new GenericRs("Ok", new String[]{"success.deleteRoom"});
+    }
+
+    @Override
+    public String getName() {
+        return "remove";
     }
 }

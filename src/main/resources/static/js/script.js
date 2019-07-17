@@ -53,7 +53,6 @@ function sendMessage(){
     var payload = element.value;
 
     var msg = {
-        "username":username,
         "message":payload
     }
 

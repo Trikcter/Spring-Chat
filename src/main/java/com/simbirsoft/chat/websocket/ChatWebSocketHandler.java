@@ -16,57 +16,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ChatWebSocketHandler implements WebSocketHandler {
-
-    private Set<WebSocketSession> sessions = new HashSet<>();
-    private Set<String> users = new HashSet<>();
-
-    private MessageDTO getUIMessage(Message message){
-        String text = message.getMessage();
-        String username = message.getAuthor().getUsername();
-        Long id = message.getId();
-
-        MessageDTO frontMessage = new MessageDTO();
-
-        frontMessage.setUsername(username);
-        frontMessage.setId(id);
-
-        if (text.contains("//")) {
-            StringBuilder command = new StringBuilder(text);
-            command.delete(0, 2);
-            text = command.toString();
-
-            GenericRs answer = commandService.executeCommand(text,username);
-
-            frontMessage.setMessage(answer.getMessage()[0]);
-            frontMessage.setTypeOfMessage(answer.getStatus());
-        }else{
-            frontMessage.setMessage(text);
-            frontMessage.setTypeOfMessage("text");
-        }
-
-        return frontMessage;
-    }
-
-    private Message saveMessage(MessageDTO messageDTO) throws MessageNotSaveException {
-
-        Message message = new Message();
-
-        message.setMessage(messageDTO.getMessage());
-
-        User saveUser = userService.getByUsername(messageDTO.getUsername()).orElse(new User());
-        message.setAuthor(saveUser);
-
-        Message messageReturn = messageService.save(message).orElseThrow(() -> new MessageNotSaveException("Ошибка сохранения в БД"));
-
-        return messageReturn;
-    }
-
     @Autowired
     private MessageService messageService;
     @Autowired
     private CommandService commandService;
     @Autowired
     private UserService userService;
+
+    private Set<WebSocketSession> sessions = new HashSet<>();
+    private Set<String> users = new HashSet<>();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession webSocketSession) throws Exception {
@@ -78,10 +36,11 @@ public class ChatWebSocketHandler implements WebSocketHandler {
         Gson g = new Gson();
 
         MessageDTO messageDTO = g.fromJson(webSocketMessage.getPayload().toString(), MessageDTO.class);
+        String username = webSocketSession.getPrincipal().getName().toString();
 
-        Message message = saveMessage(messageDTO);
+        Message message = saveMessage(messageDTO,username);
 
-        MessageDTO frontMessage = getUIMessage(message);
+        MessageDTO frontMessage = getUIMessage(message,username);
 
         if (!("text".equals(frontMessage.getTypeOfMessage()))) {
             String json = g.toJson(frontMessage);
@@ -109,5 +68,46 @@ public class ChatWebSocketHandler implements WebSocketHandler {
     @Override
     public boolean supportsPartialMessages() {
         return false;
+    }
+
+    private MessageDTO getUIMessage(Message message, String username) throws Exception {
+        String text = message.getMessage();
+        User user = userService.getByUsername(username).orElseThrow(() -> new Exception());
+        Long id = message.getId();
+
+        MessageDTO frontMessage = new MessageDTO();
+
+        frontMessage.setUsername(username);
+        frontMessage.setId(id);
+
+        if (text.contains("//")) {
+            StringBuilder command = new StringBuilder(text);
+            command.delete(0, 2);
+            text = command.toString();
+
+            GenericRs answer = commandService.executeCommand(text,user);
+
+            frontMessage.setMessage(answer.getMessage()[0]);
+            frontMessage.setTypeOfMessage(answer.getStatus());
+        }else{
+            frontMessage.setMessage(text);
+            frontMessage.setTypeOfMessage("text");
+        }
+
+        return frontMessage;
+    }
+
+    private Message saveMessage(MessageDTO messageDTO, String username) throws Exception {
+
+        Message message = new Message();
+
+        message.setMessage(messageDTO.getMessage());
+
+        User saveUser = userService.getByUsername(username).orElseThrow(() -> new Exception());
+        message.setAuthor(saveUser);
+
+        Message messageReturn = messageService.save(message).orElseThrow(() -> new MessageNotSaveException("Ошибка сохранения в БД"));
+
+        return messageReturn;
     }
 }

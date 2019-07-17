@@ -11,6 +11,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
 import java.util.Locale;
+import java.util.Optional;
 
 @Component
 public class CreateCommand implements BasicCommand {
@@ -22,15 +23,21 @@ public class CreateCommand implements BasicCommand {
     private UserService userService;
 
     @Override
-    public GenericRs executeCommand(CommandAttribute command, String username) {
+    public GenericRs executeCommand(CommandAttribute command, User user) {
         if (!("room".equals(command.getCommands()[0]))) {
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.commandNotFound", new Object[0], new Locale("ru"))});
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.commandNotFound", new Object[0], Locale.getDefault())});
         }
 
-        User owner = userService.getByUsername(username).orElse(new User());
+        User owner = user;
 
-        if (command.getCommands().length > 3 && command.getCommands()[2] == "-c") {
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.undefinedName", new Object[0], new Locale("ru"))});
+        if (command.getCommands().length > 3 && "-c".equals(command.getCommands()[2])) {
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.undefinedName", new Object[0], Locale.getDefault())});
+        }
+
+        Optional<Room> findRoom = roomService.getRoomByName(command.getCommands()[2]);
+
+        if(findRoom.isPresent()){
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.existRoom", new Object[0], Locale.getDefault())});
         }
 
         Room room = new Room();
@@ -38,7 +45,7 @@ public class CreateCommand implements BasicCommand {
         room.setName(command.getCommands()[2]);
         room.setOwner(owner);
 
-        if (command.getCommands().length == 4 && command.getCommands()[3] == "-c") {
+        if (command.getCommands().length == 4 && "-c".equals(command.getCommands()[3])) {
             room.setLocked(true);
         }
 
@@ -46,6 +53,11 @@ public class CreateCommand implements BasicCommand {
 
         roomService.addRoom(room);
 
-        return new GenericRs("Ok", new String[]{"Комната была успешно создана!"});
+        return new GenericRs("Ok", new String[]{messageSource.getMessage("success.createRoom",new Object[0], Locale.getDefault())});
+    }
+
+    @Override
+    public String getName() {
+        return "create";
     }
 }

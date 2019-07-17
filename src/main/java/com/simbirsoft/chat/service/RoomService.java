@@ -15,7 +15,7 @@ public interface RoomService {
 
     void addMessage(Message message);
 
-    void addParticipants(User user,Room room);
+    void addParticipants(User user, Room room);
 
     Optional<Room> getRoomByName(String name);
 

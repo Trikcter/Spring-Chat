@@ -42,7 +42,7 @@ public class WebControllers {
 
         model.addAttribute("username", username);
         model.addAttribute("isSuperuser", isSuperuser);
-        model.addAttribute("rooms",rooms);
+        model.addAttribute("rooms", rooms);
 
         return "messages";
     }

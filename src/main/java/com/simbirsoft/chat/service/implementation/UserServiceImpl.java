@@ -23,6 +23,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Создание нового пользователя и добавление его в БД
+     *
      * @param userDTO - DTO для User, приходящая с фронта
      */
     @Override
@@ -40,6 +41,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Удаление пользователя из БД
+     *
      * @param username - имя пользователя
      */
     @Override
@@ -65,6 +67,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Получаем список всех пользователей в виде DTO для передачи на фронт
+     *
      * @return список всех пользователей из БД
      */
     @Override
@@ -72,7 +75,7 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepository.findAll();
         List<UserDTO> answer = new ArrayList<>();
 
-        for(User user: users){
+        for (User user : users) {
             UserDTO userDTO = new UserDTO();
 
             userDTO.setActive(user.getActive());
@@ -81,7 +84,7 @@ public class UserServiceImpl implements UserService {
 
             List<Role> roles = new ArrayList<>();
 
-            for(Role role : user.getRoles()){
+            for (Role role : user.getRoles()) {
                 roles.add(role);
             }
 
@@ -95,6 +98,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Сохраняем пользователя в БД
+     *
      * @param user объект, который необходимо сохранить
      * @return возвращаем новый объект в случае успешного сохранения в БД
      */
@@ -111,6 +115,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Метод для установки нового модератора
+     *
      * @param username имя пользователя
      */
     @Override
@@ -123,6 +128,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Метод для удаления прав администратора
+     *
      * @param username имя пользователя
      */
     @Override
@@ -139,6 +145,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Метод для бана пользователя
+     *
      * @param username имя пользователя
      */
     @Override
@@ -151,6 +158,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * Метод для разбана пользователя
+     *
      * @param username - имя пользователя
      */
     @Override

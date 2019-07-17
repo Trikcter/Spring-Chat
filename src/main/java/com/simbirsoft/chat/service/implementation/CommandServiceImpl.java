@@ -1,6 +1,7 @@
 package com.simbirsoft.chat.service.implementation;
 
 import com.simbirsoft.chat.command.*;
+import com.simbirsoft.chat.entity.User;
 import com.simbirsoft.chat.model.CommandAttribute;
 import com.simbirsoft.chat.model.GenericRs;
 import com.simbirsoft.chat.service.CommandService;
@@ -8,24 +9,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
 public class CommandServiceImpl implements CommandService {
 
-    private Map<String, BasicCommand> cmdMap() {
-        Map<String, BasicCommand> commandMap = new HashMap<>();
-
-        commandMap.put("rename", renameCommand);
-        commandMap.put("ban", banCommand);
-        commandMap.put("moderator", superUserCommand);
-        commandMap.put("connect", connectCommand);
-        commandMap.put("create", createCommand);
-        commandMap.put("disconnect", disconnectCommand);
-        commandMap.put("remove", removeCommand);
-
-        return commandMap;
+    @PostConstruct
+    private void cmdMap() {
+        commandMap.put(renameCommand.getName(), renameCommand);
+        commandMap.put(banCommand.getName(), banCommand);
+        commandMap.put(superUserCommand.getName(), superUserCommand);
+        commandMap.put(connectCommand.getName(), connectCommand);
+        commandMap.put(createCommand.getName(), createCommand);
+        commandMap.put(disconnectCommand.getName(), disconnectCommand);
+        commandMap.put(removeCommand.getName(), removeCommand);
     }
 
     @Autowired
@@ -46,15 +45,14 @@ public class CommandServiceImpl implements CommandService {
     private Map<String, BasicCommand> commandMap = new HashMap<>();
 
     @Override
-    public GenericRs executeCommand(String command, String username) {
+    public GenericRs executeCommand(String command, User user) {
         String[] attr = command.split(" ");
-        commandMap = cmdMap();
 
         CommandAttribute commandAttribute = new CommandAttribute(attr);
 
         BasicCommand execute = commandMap.get(attr[1]);
 
-        GenericRs genericRs = execute.executeCommand(commandAttribute, username);
+        GenericRs genericRs = execute.executeCommand(commandAttribute, user);
 
         return genericRs;
     }

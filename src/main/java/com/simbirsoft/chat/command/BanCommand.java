@@ -20,31 +20,36 @@ public class BanCommand implements BasicCommand {
     private MessageSource messageSource;
 
     @Override
-    public GenericRs executeCommand(CommandAttribute command, String username) {
-        if(!("user".equals(command.getCommands()[0]))){
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.commandNotFound",new Object[0],new Locale("ru"))});
+    public GenericRs executeCommand(CommandAttribute command, User user) {
+        if (!("user".equals(command.getCommands()[0]))) {
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.commandNotFound", new Object[0], Locale.getDefault())});
         }
 
-        User requestUser = userService.getByUsername(username).orElse(new User());
+        User requestUser = user;
 
-        if(!(requestUser.getRoles().contains(Role.MODERATOR) || requestUser.getRoles().contains(Role.ADMIN))){
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.notSuperuser",new Object[0],new Locale("ru"))});
+        if (!(requestUser.getRoles().contains(Role.MODERATOR) || requestUser.getRoles().contains(Role.ADMIN))) {
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.notSuperuser", new Object[0], Locale.getDefault())});
         }
 
         Optional<User> banUser = userService.getByUsername(command.getCommands()[2]);
 
-        if(!(banUser.isPresent())){
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.userNotFound",new Object[0],new Locale("ru"))});
+        if (!(banUser.isPresent())) {
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.userNotFound", new Object[0], Locale.getDefault())});
         }
 
-        User user = banUser.get();
+        User userBan = banUser.get();
 
-        if(!(user.getActive())){
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.alreadyBan",new Object[0],new Locale("ru"))});
+        if (!(userBan.getActive())) {
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.alreadyBan", new Object[0], Locale.getDefault())});
         }
 
-        userService.blockUser(user.getId());
+        userService.blockUser(userBan.getId());
 
-        return new GenericRs("Ok", new String[]{"Пользователь был забанен!"});
+        return new GenericRs("Ok", new String[]{"success.userBan"});
+    }
+
+    @Override
+    public String getName() {
+        return "ban";
     }
 }

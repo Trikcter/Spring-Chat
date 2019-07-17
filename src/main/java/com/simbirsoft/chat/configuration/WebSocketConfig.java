@@ -12,7 +12,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
     @Bean
-    public ChatWebSocketHandler chatWebSocketHandler(){
+    public ChatWebSocketHandler chatWebSocketHandler() {
         return new ChatWebSocketHandler();
     }
 

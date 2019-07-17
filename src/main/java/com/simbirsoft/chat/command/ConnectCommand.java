@@ -24,31 +24,36 @@ public class ConnectCommand implements BasicCommand {
     private RoomService roomService;
 
     @Override
-    public GenericRs executeCommand(CommandAttribute command, String username) {
+    public GenericRs executeCommand(CommandAttribute command, User user) {
         if (!("room".equals(command.getCommands()[0]))) {
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.commandNotFound", new Object[0], new Locale("ru"))});
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.commandNotFound", new Object[0], Locale.getDefault())});
         }
 
-        User owner = userService.getByUsername(username).orElse(new User());
+        User owner = user;
 
-        if(command.getCommands().length > 3 && command.getCommands()[2] == ""){
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.undefinedName", new Object[0], new Locale("ru"))});
+        if (command.getCommands().length > 3 && "".equals(command.getCommands()[2])) {
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.undefinedName", new Object[0], Locale.getDefault())});
         }
 
         Optional<Room> cnRoom = roomService.getRoomByName(command.getCommands()[2]);
 
-        if(!(cnRoom.isPresent())){
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.nonExistName", new Object[0], new Locale("ru"))});
+        if (!(cnRoom.isPresent())) {
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.nonExistName", new Object[0], Locale.getDefault())});
         }
 
         Room room = cnRoom.get();
 
-        if(room.getLocked() == true && room.getOwner().getId() != owner.getId() && !(owner.getRoles().contains(Role.ADMIN))){
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.notOwner", new Object[0], new Locale("ru"))});
+        if (room.getLocked() && !(room.getOwner().getId().equals(owner.getId())) && !(owner.getRoles().contains(Role.ADMIN))) {
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.notOwner", new Object[0], Locale.getDefault())});
         }
 
-        roomService.addParticipants(owner,room);
+        roomService.addParticipants(owner, room);
 
-        return new GenericRs("Ok", new String[]{"Вы подключились к комнате!"});
+        return new GenericRs("Ok", new String[]{messageSource.getMessage("success.openConnection",new Object[0], Locale.getDefault())});
+    }
+
+    @Override
+    public String getName() {
+        return "connect";
     }
 }

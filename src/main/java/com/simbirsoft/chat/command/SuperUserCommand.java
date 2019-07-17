@@ -20,46 +20,50 @@ public class SuperUserCommand implements BasicCommand {
     private MessageSource messageSource;
 
     @Override
-    public GenericRs executeCommand(CommandAttribute command, String username) {
-        if(!("user".equals(command.getCommands()[0]))){
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.commandNotFound",new Object[0],new Locale("ru"))});
+    public GenericRs executeCommand(CommandAttribute command, User userR) {
+        if (!("user".equals(command.getCommands()[0]))) {
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.commandNotFound", new Object[0], Locale.getDefault())});
         }
 
-        User requestUser = userService.getByUsername(username).orElse(new User());
+        User requestUser = userR;
 
-        if(!(requestUser.getRoles().contains(Role.ADMIN))){
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.notSuperuser",new Object[0],new Locale("ru"))});
+        if (!(requestUser.getRoles().contains(Role.ADMIN))) {
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.notSuperuser", new Object[0], Locale.getDefault())});
         }
 
         Optional<User> moderatorUser = userService.getByUsername(command.getCommands()[2]);
 
-        if(!(moderatorUser.isPresent())){
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.userNotFound",new Object[0],new Locale("ru"))});
+        if (!(moderatorUser.isPresent())) {
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.userNotFound", new Object[0], Locale.getDefault())});
         }
 
         User user = moderatorUser.get();
 
-        if(!("-n".equals(command.getCommands()[3]) || "-d".equals(command.getCommands()[3]))){
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.commandNotFound",new Object[0],new Locale("ru"))});
+        if (!("-n".equals(command.getCommands()[3]) || "-d".equals(command.getCommands()[3]))) {
+            return new GenericRs("Error", new String[]{messageSource.getMessage("error.commandNotFound", new Object[0], Locale.getDefault())});
         }
 
-        if("-n".equals(command.getCommands()[3])){
-            if(user.getRoles().contains(Role.MODERATOR)){
-                return new GenericRs("Error", new String[]{messageSource.getMessage("error.alreadyModerator",new Object[0],new Locale("ru"))});
+        if ("-n".equals(command.getCommands()[3])) {
+            if (user.getRoles().contains(Role.MODERATOR)) {
+                return new GenericRs("Error", new String[]{messageSource.getMessage("error.alreadyModerator", new Object[0], Locale.getDefault())});
             }
 
             userService.makeModerator(user.getId());
 
-            return new GenericRs("Ban", new String[]{"Пользователь был повышен до модератора!"});
-        }
-        else{
-            if(!(user.getRoles().contains(Role.MODERATOR))){
-                return new GenericRs("Error", new String[]{messageSource.getMessage("error.alreadyUser",new Object[0],new Locale("ru"))});
+            return new GenericRs("Ban", new String[]{"success.setModerator"});
+        } else {
+            if (!(user.getRoles().contains(Role.MODERATOR))) {
+                return new GenericRs("Error", new String[]{messageSource.getMessage("error.alreadyUser", new Object[0], Locale.getDefault())});
             }
 
             userService.removeModerator(user.getId());
 
-            return new GenericRs("Ban", new String[]{"Пользователь был понижен!"});
+            return new GenericRs("Ban", new String[]{"success.setUser"});
         }
+    }
+
+    @Override
+    public String getName() {
+        return "moderator";
     }
 }
