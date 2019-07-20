@@ -26,13 +26,18 @@ sock.onmessage = function(e) {
             drawMessage(words.id,words.username,words.message);
             break;
         case "Error":
-            alert(words.message);
+            alert("Ошибка");
             break;
         case "Rename":
             rename(words.message);
+            alert("Имя было изменено!");
             break;
         case "Ok":
-            alert(words.message);
+            alert("Все окей");
+            break;
+        case "Connect":
+            alert("Вы подключились к комнате");
+            rename(words.message);
             break;
     }
 };
@@ -111,5 +116,4 @@ function drawMessage(id,username,payload){
 function rename(newName){
     var username = document.getElementById("username")
     username.innerText = newName;
-    alert("Имя было изменено!");
 }

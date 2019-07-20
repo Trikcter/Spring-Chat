@@ -29,8 +29,15 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
-    public void addMessage(Message message) {
+    public Message addMessage(Message message, Room room) {
+        List<Message> newMessage = room.getMessages();
+        newMessage.add(message);
 
+        room.setMessages(newMessage);
+
+        roomRepository.save(room);
+
+        return message;
     }
 
     @Override
@@ -64,12 +71,26 @@ public class RoomServiceImpl implements RoomService {
 
         List<Room> openRooms = roomRepository.findRoomByIsLocked(false);
 
-        List<Room> participantRooms = roomRepository.findRoomByParticipants(user);
+        Optional<Room> participantRoom = roomRepository.findRoomByParticipants(user);
 
         roomSet.addAll(rooms);
         roomSet.addAll(openRooms);
-        roomSet.addAll(participantRooms);
+
+        if (participantRoom.isPresent()) {
+            Room room = participantRoom.get();
+            roomSet.add(room);
+        }
 
         return roomSet;
+    }
+
+    @Override
+    public Optional<Room> getRoomByUser(User user) {
+        return roomRepository.findRoomByParticipants(user);
+    }
+
+    @Override
+    public List<Room> getAll() {
+        return roomRepository.findAll();
     }
 }

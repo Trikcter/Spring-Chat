@@ -36,7 +36,7 @@ public class CreateCommand implements BasicCommand {
 
         Optional<Room> findRoom = roomService.getRoomByName(command.getCommands()[2]);
 
-        if(findRoom.isPresent()){
+        if (findRoom.isPresent()) {
             return new GenericRs("Error", new String[]{messageSource.getMessage("error.existRoom", new Object[0], Locale.getDefault())});
         }
 
@@ -53,7 +53,7 @@ public class CreateCommand implements BasicCommand {
 
         roomService.addRoom(room);
 
-        return new GenericRs("Ok", new String[]{messageSource.getMessage("success.createRoom",new Object[0], Locale.getDefault())});
+        return new GenericRs("Create", new String[]{room.getName()});
     }
 
     @Override

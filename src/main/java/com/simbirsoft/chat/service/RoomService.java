@@ -13,7 +13,7 @@ public interface RoomService {
 
     void delete(Room room);
 
-    void addMessage(Message message);
+    Message addMessage(Message message, Room room);
 
     void addParticipants(User user, Room room);
 
@@ -22,4 +22,8 @@ public interface RoomService {
     void edit(Room room);
 
     Set<Room> getRoomsByUsername(String username);
+
+    Optional<Room> getRoomByUser(User user);
+
+    List<Room> getAll();
 }

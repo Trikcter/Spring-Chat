@@ -31,7 +31,7 @@ public class RemoveCommand implements BasicCommand {
 
         User owner = user;
 
-        if (command.getCommands().length > 3 && command.getCommands()[2] == "") {
+        if (command.getCommands().length > 3 && "".equals(command.getCommands()[2])) {
             return new GenericRs("Error", new String[]{messageSource.getMessage("error.undefinedName", new Object[0], Locale.getDefault())});
         }
 
@@ -43,7 +43,7 @@ public class RemoveCommand implements BasicCommand {
 
         Room room = rmRoom.get();
 
-        if (room.getOwner().getId() != owner.getId() && !(owner.getRoles().contains(Role.ADMIN))) {
+        if (!(room.getOwner().getId().equals(owner.getId())) && !(owner.getRoles().contains(Role.ADMIN))) {
             return new GenericRs("Error", new String[]{messageSource.getMessage("error.notOwner", new Object[0], Locale.getDefault())});
         }
 

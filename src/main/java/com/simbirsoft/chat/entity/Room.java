@@ -22,11 +22,11 @@ public class Room {
     @JoinColumn(name = "user_id")
     private User owner;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "participant_of_room", joinColumns = @JoinColumn(name = "room_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> participants = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
     @JoinTable(name = "history_of_message", joinColumns = @JoinColumn(name = "room_id"), inverseJoinColumns = @JoinColumn(name = "message_id"))
     private List<Message> messages = new ArrayList<>();
 

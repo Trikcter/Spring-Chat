@@ -49,7 +49,7 @@ public class ConnectCommand implements BasicCommand {
 
         roomService.addParticipants(owner, room);
 
-        return new GenericRs("Ok", new String[]{messageSource.getMessage("success.openConnection",new Object[0], Locale.getDefault())});
+        return new GenericRs("Connect", new String[]{room.getName()});
     }
 
     @Override

@@ -16,13 +16,10 @@
             <div class = "col s2">
                 <ul class="collection with-header">
                     <li class="collection-header"><h5>Доступные комнаты</h5></li>
-                    <li class="collection-item"><div>Общий чат<a href="/messages" class="secondary-content"><i class="material-icons">send</i></a></div></li>
+                    <li class="collection-item"><div>Общий чат</div></li>
                     <li class="collection-item" th:each = "room : ${rooms}">
                         <div>
                             <span th:text = "${room.name}"></span>
-                            <a href="/messages" class="secondary-content">
-                                <i class="material-icons">send</i>
-                            </a>
                         </div>
                     </li>
                 </ul>
