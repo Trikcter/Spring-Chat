@@ -1,5 +1,6 @@
 package com.simbirsoft.chat.command;
 
+import com.simbirsoft.chat.Task.BanTask;
 import com.simbirsoft.chat.entity.Role;
 import com.simbirsoft.chat.entity.User;
 import com.simbirsoft.chat.model.CommandAttribute;
@@ -7,8 +8,11 @@ import com.simbirsoft.chat.model.GenericRs;
 import com.simbirsoft.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
+import java.util.Date;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -41,6 +45,22 @@ public class BanCommand implements BasicCommand {
 
         if (!(userBan.getActive())) {
             return new GenericRs("Error", new String[]{messageSource.getMessage("error.alreadyBan", new Object[0], Locale.getDefault())});
+        }
+
+        if (command.getCommands().length > 4 && "-m".equals(command.getCommands()[3]) && !("".equals(command.getCommands()[4]))) {
+            long timeToBan = Integer.parseInt(command.getCommands()[4]);
+            timeToBan = timeToBan*60000;
+
+            TaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
+
+            taskScheduler.schedule(
+                    new BanTask(userBan.getUsername()),
+                    new Date(System.currentTimeMillis() + timeToBan)
+            );
+        }else{
+            if (command.getCommands().length > 4 && "-l".equals(command.getCommands()[3]) && !("".equals(command.getCommands()[4]))){
+                userService.deleteFromAllRooms(userBan);
+            }
         }
 
         userService.blockUser(userBan.getId());

@@ -54,10 +54,6 @@ public class DisconnectCommand implements BasicCommand {
 
         room.setParticipants(participants);
 
-        /*if (!(room.getOwner().getId().equals(owner.getId())) && !(owner.getRoles().contains(Role.ADMIN))) {
-            return new GenericRs("Error", new String[]{messageSource.getMessage("error.notOwner", new Object[0], Locale.getDefault())});
-        }*/
-
         roomService.addRoom(room);
 
         return new GenericRs("Ok", new String[]{messageSource.getMessage("success.disconnectRoom", new Object[0], Locale.getDefault())});

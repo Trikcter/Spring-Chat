@@ -26,4 +26,6 @@ public interface UserService {
     void blockUser(Long id);
 
     void unblockUser(Long id);
+
+    void deleteFromAllRooms(User user);
 }

@@ -2,10 +2,11 @@ package com.simbirsoft.chat;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-// TODO Добавить нормальный скрипт LiquilBase
 
 @SpringBootApplication
+@EnableScheduling
 public class ChatApplication {
 
     public static void main(String[] args) {

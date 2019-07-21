@@ -1,9 +1,12 @@
 package com.simbirsoft.chat.service.implementation;
 
+import com.simbirsoft.chat.DAO.RoomRepository;
 import com.simbirsoft.chat.DAO.UserRepository;
 import com.simbirsoft.chat.entity.Role;
+import com.simbirsoft.chat.entity.Room;
 import com.simbirsoft.chat.entity.User;
 import com.simbirsoft.chat.model.UserDTO;
+import com.simbirsoft.chat.service.RoomService;
 import com.simbirsoft.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -11,21 +14,18 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-/**
- * @author Bolgov
- * Сервис для управления User'ами
- */
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
 
-    /**
-     * Создание нового пользователя и добавление его в БД
-     *
-     * @param userDTO - DTO для User, приходящая с фронта
-     */
+    @Autowired
+    private RoomRepository roomRepository;
+
+    @Autowired
+    private RoomService roomService;
+
     @Override
     public void addUser(UserDTO userDTO) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -39,11 +39,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    /**
-     * Удаление пользователя из БД
-     *
-     * @param username - имя пользователя
-     */
     @Override
     public void delete(Long id) {
         User delUser = userRepository.findById(id).orElse(new User());
@@ -65,11 +60,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    /**
-     * Получаем список всех пользователей в виде DTO для передачи на фронт
-     *
-     * @return список всех пользователей из БД
-     */
     @Override
     public List<UserDTO> getAll() {
         List<User> users = userRepository.findAll();
@@ -96,12 +86,6 @@ public class UserServiceImpl implements UserService {
         return answer;
     }
 
-    /**
-     * Сохраняем пользователя в БД
-     *
-     * @param user объект, который необходимо сохранить
-     * @return возвращаем новый объект в случае успешного сохранения в БД
-     */
     @Override
     public User save(User user) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -113,11 +97,6 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-    /**
-     * Метод для установки нового модератора
-     *
-     * @param username имя пользователя
-     */
     @Override
     public void makeModerator(Long id) {
         User user = userRepository.findById(id).orElse(new User());
@@ -126,11 +105,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    /**
-     * Метод для удаления прав администратора
-     *
-     * @param username имя пользователя
-     */
     @Override
     public void removeModerator(Long id) {
         User user = userRepository.findById(id).orElse(new User());
@@ -143,11 +117,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    /**
-     * Метод для бана пользователя
-     *
-     * @param username имя пользователя
-     */
     @Override
     public void blockUser(Long id) {
         User user = userRepository.findById(id).orElse(new User());
@@ -156,16 +125,34 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    /**
-     * Метод для разбана пользователя
-     *
-     * @param username - имя пользователя
-     */
     @Override
     public void unblockUser(Long id) {
         User user = userRepository.findById(id).orElse(new User());
         user.setActive(true);
 
         userRepository.save(user);
+    }
+
+    @Override
+    public void deleteFromAllRooms(User user) {
+        Optional<Room> deleteRoom = roomRepository.findRoomByParticipants(user);
+
+        if (deleteRoom.isPresent()) {
+            Set<User> participants;
+            participants = deleteRoom.get().getParticipants();
+
+            Room room = deleteRoom.get();
+
+            for (User rmUser : participants) {
+                if (rmUser.getUsername().equals(user.getUsername())) {
+                    participants.remove(rmUser);
+                    break;
+                }
+            }
+
+            room.setParticipants(participants);
+
+            roomService.addRoom(room);
+        }
     }
 }
