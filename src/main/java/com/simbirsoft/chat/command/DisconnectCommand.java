@@ -43,18 +43,25 @@ public class DisconnectCommand implements BasicCommand {
 
         Room room = rmRoom.get();
 
-        Set<User> participants = room.getParticipants();
+        if (command.getCommands().length > 4 && "-l".equals(command.getCommands()[3]) && !("".equals(command.getCommands()[4]))) {
+            String banUsername = command.getCommands()[4];
+            User banUser = userService.getByUsername(banUsername).orElse(new User());
 
-        for (User rmUser : participants) {
-            if (rmUser.getId().equals(owner.getId())) {
-                participants.remove(rmUser);
-                break;
+            roomService.banUser(banUser,room);
+        }else {
+            Set<User> participants = room.getParticipants();
+
+            for (User rmUser : participants) {
+                if (rmUser.getId().equals(owner.getId())) {
+                    participants.remove(rmUser);
+                    break;
+                }
             }
+
+            room.setParticipants(participants);
+
+            roomService.addRoom(room);
         }
-
-        room.setParticipants(participants);
-
-        roomService.addRoom(room);
 
         return new GenericRs("Ok", new String[]{messageSource.getMessage("success.disconnectRoom", new Object[0], Locale.getDefault())});
     }

@@ -93,4 +93,15 @@ public class RoomServiceImpl implements RoomService {
     public List<Room> getAll() {
         return roomRepository.findAll();
     }
+
+    @Override
+    public void banUser(User user, Room room) {
+        Set<User> banList = room.getBanList();
+
+        banList.add(user);
+
+        room.setBanList(banList);
+
+        roomRepository.save(room);
+    }
 }

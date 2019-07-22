@@ -1,5 +1,6 @@
 package com.simbirsoft.chat.controllers;
 
+import com.simbirsoft.chat.entity.Role;
 import com.simbirsoft.chat.model.GenericRs;
 import com.simbirsoft.chat.model.UserDTO;
 import com.simbirsoft.chat.service.MessageService;
@@ -14,9 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.List;
-
-// TODO : Сделать адекватную проверку на роль Администратора, что бы его не выводило
-// TODO Не работает вывод прав пользователя, надо сделать реактивно
 
 @Controller
 @RequestMapping("/panel")
@@ -37,6 +35,13 @@ public class PanelController {
         for (GrantedAuthority grantedAuthority : authorities) {
             if (grantedAuthority.getAuthority().equals("ADMIN")) {
                 isSuperuser = true;
+                break;
+            }
+        }
+
+        for(UserDTO user : users){
+            if(user.getRoleSet().contains(Role.ADMIN)){
+                users.remove(user);
                 break;
             }
         }

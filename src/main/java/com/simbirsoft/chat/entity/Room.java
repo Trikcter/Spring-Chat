@@ -30,6 +30,10 @@ public class Room {
     @JoinTable(name = "history_of_message", joinColumns = @JoinColumn(name = "room_id"), inverseJoinColumns = @JoinColumn(name = "message_id"))
     private List<Message> messages = new ArrayList<>();
 
+    @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @JoinTable(name = "banList", joinColumns = @JoinColumn(name = "unavailableRoom_id"), inverseJoinColumns = @JoinColumn(name = "userBan_id"))
+    private Set<User> banList = new HashSet<>();
+
     public Room(String name, User owner) {
         this.name = name;
         this.owner = owner;
@@ -84,5 +88,13 @@ public class Room {
 
     public void setMessages(List<Message> messages) {
         this.messages = messages;
+    }
+
+    public Set<User> getBanList() {
+        return banList;
+    }
+
+    public void setBanList(Set<User> banList) {
+        this.banList = banList;
     }
 }

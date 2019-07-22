@@ -1,6 +1,5 @@
 package com.simbirsoft.chat.command;
 
-import com.simbirsoft.chat.Task.BanTask;
 import com.simbirsoft.chat.entity.Role;
 import com.simbirsoft.chat.entity.User;
 import com.simbirsoft.chat.model.CommandAttribute;
@@ -8,13 +7,12 @@ import com.simbirsoft.chat.model.GenericRs;
 import com.simbirsoft.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
 
 @Component
 public class BanCommand implements BasicCommand {
@@ -48,17 +46,9 @@ public class BanCommand implements BasicCommand {
         }
 
         if (command.getCommands().length > 4 && "-m".equals(command.getCommands()[3]) && !("".equals(command.getCommands()[4]))) {
-            long timeToBan = Integer.parseInt(command.getCommands()[4]);
-            timeToBan = timeToBan*60000;
-
-            TaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
-
-            taskScheduler.schedule(
-                    new BanTask(userBan.getUsername()),
-                    new Date(System.currentTimeMillis() + timeToBan)
-            );
-        }else{
-            if (command.getCommands().length > 4 && "-l".equals(command.getCommands()[3]) && !("".equals(command.getCommands()[4]))){
+            BanTask(userBan,command);
+        } else {
+            if (command.getCommands().length > 4 && "-l".equals(command.getCommands()[3]) && !("".equals(command.getCommands()[4]))) {
                 userService.deleteFromAllRooms(userBan);
             }
         }
@@ -71,5 +61,27 @@ public class BanCommand implements BasicCommand {
     @Override
     public String getName() {
         return "ban";
+    }
+
+    private void BanTask(User userBan,CommandAttribute command){
+        long timeToBan = Integer.parseInt(command.getCommands()[4]);
+        timeToBan = timeToBan * 60000;
+
+        TimerTask task = new TimerTask() {
+            public void run() {
+                userService.save(userBan);
+                cancel();
+            }
+        };
+
+        Timer timer = new Timer("TimerForUnBan");
+
+        timer.scheduleAtFixedRate(task, timeToBan, 1000L);
+
+        try {
+            Thread.sleep(1000L * 2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

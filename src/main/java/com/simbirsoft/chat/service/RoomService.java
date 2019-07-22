@@ -26,4 +26,6 @@ public interface RoomService {
     Optional<Room> getRoomByUser(User user);
 
     List<Room> getAll();
+
+    void banUser(User user, Room room);
 }
