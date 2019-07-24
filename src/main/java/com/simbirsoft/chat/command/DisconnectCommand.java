@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Component
 public class DisconnectCommand implements BasicCommand {
@@ -48,6 +46,29 @@ public class DisconnectCommand implements BasicCommand {
             User banUser = userService.getByUsername(banUsername).orElse(new User());
 
             roomService.banUser(banUser,room);
+
+            if (command.getCommands().length > 6 && "-m".equals(command.getCommands()[5]) && !("".equals(command.getCommands()[6]))){
+                long timeToBan = Integer.parseInt(command.getCommands()[6]);
+                timeToBan = timeToBan * 60000;
+
+                TimerTask task = new TimerTask() {
+                    public void run() {
+                        roomService.unbanUser(banUser,room);
+                        cancel();
+                    }
+                };
+
+                Timer timer = new Timer("TimerForUnBanRoom");
+
+                timer.scheduleAtFixedRate(task, timeToBan, 1000L);
+
+                try {
+                    Thread.sleep(1000L * 2);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
         }else {
             Set<User> participants = room.getParticipants();
 

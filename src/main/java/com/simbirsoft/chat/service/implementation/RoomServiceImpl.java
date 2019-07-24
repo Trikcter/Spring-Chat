@@ -73,12 +73,19 @@ public class RoomServiceImpl implements RoomService {
 
         Optional<Room> participantRoom = roomRepository.findRoomByParticipants(user);
 
+        Optional<Room> banRoomOptional = roomRepository.findRoomBybanList(user);
+
         roomSet.addAll(rooms);
         roomSet.addAll(openRooms);
 
         if (participantRoom.isPresent()) {
             Room room = participantRoom.get();
             roomSet.add(room);
+        }
+
+        if(banRoomOptional.isPresent()){
+            Room banRoom = banRoomOptional.get();
+            roomSet.remove(banRoom);
         }
 
         return roomSet;
@@ -99,6 +106,18 @@ public class RoomServiceImpl implements RoomService {
         Set<User> banList = room.getBanList();
 
         banList.add(user);
+
+        room.setBanList(banList);
+
+        userService.deleteFromAllRooms(user);
+        roomRepository.save(room);
+    }
+
+    @Override
+    public void unbanUser(User user, Room room) {
+        Set<User> banList = room.getBanList();
+
+        banList.remove(user);
 
         room.setBanList(banList);
 

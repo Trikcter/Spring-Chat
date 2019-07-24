@@ -28,4 +28,6 @@ public interface RoomService {
     List<Room> getAll();
 
     void banUser(User user, Room room);
+
+    void unbanUser(User user, Room room);
 }

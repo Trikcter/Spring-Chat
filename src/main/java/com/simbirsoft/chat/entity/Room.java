@@ -31,7 +31,7 @@ public class Room {
     private List<Message> messages = new ArrayList<>();
 
     @ManyToMany(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
-    @JoinTable(name = "banList", joinColumns = @JoinColumn(name = "unavailableRoom_id"), inverseJoinColumns = @JoinColumn(name = "userBan_id"))
+    @JoinTable(name = "ban_list", joinColumns = @JoinColumn(name = "room_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> banList = new HashSet<>();
 
     public Room(String name, User owner) {

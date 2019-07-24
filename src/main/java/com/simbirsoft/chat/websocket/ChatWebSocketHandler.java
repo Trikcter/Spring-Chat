@@ -1,10 +1,10 @@
 package com.simbirsoft.chat.websocket;
 
 import com.google.gson.Gson;
+import com.simbirsoft.chat.entity.Message;
 import com.simbirsoft.chat.entity.Room;
 import com.simbirsoft.chat.entity.User;
 import com.simbirsoft.chat.exceptions.MessageNotSaveException;
-import com.simbirsoft.chat.entity.Message;
 import com.simbirsoft.chat.model.GenericRs;
 import com.simbirsoft.chat.model.MessageDTO;
 import com.simbirsoft.chat.service.CommandService;
@@ -12,10 +12,8 @@ import com.simbirsoft.chat.service.MessageService;
 import com.simbirsoft.chat.service.RoomService;
 import com.simbirsoft.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
 import org.springframework.web.socket.*;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 
 public class ChatWebSocketHandler implements WebSocketHandler {
@@ -27,24 +25,12 @@ public class ChatWebSocketHandler implements WebSocketHandler {
     private UserService userService;
     @Autowired
     private RoomService roomService;
-    @Autowired
-    private MessageSource messageSource;
 
     private HashMap<String, WebSocketSession> sessions = new HashMap<>();
-    private WeakHashMap<String, Set<User>> userRoom = new WeakHashMap<>();
-
-    @PostConstruct
-    private void loadRooms() {
-        List<Room> rooms = roomService.getAll();
-
-        for (Room room : rooms) {
-            userRoom.put(room.getName(), room.getParticipants());
-        }
-    }
 
     @Override
     public void afterConnectionEstablished(WebSocketSession webSocketSession) throws Exception {
-        User user = userService.getByUsername(webSocketSession.getPrincipal().getName().toString()).orElseThrow(Exception::new);
+        User user = userService.getByUsername(webSocketSession.getPrincipal().getName()).orElseThrow(Exception::new);
         sessions.put(user.getUsername(), webSocketSession);
     }
 
@@ -53,42 +39,26 @@ public class ChatWebSocketHandler implements WebSocketHandler {
         Gson g = new Gson();
 
         MessageDTO messageDTO = g.fromJson(webSocketMessage.getPayload().toString(), MessageDTO.class);
-        String username = webSocketSession.getPrincipal().getName().toString();
+        String username = webSocketSession.getPrincipal().getName();
 
-        Message message = saveMessage(messageDTO, username);
         User user = userService.getByUsername(username).orElseThrow((Exception::new));
 
-        MessageDTO frontMessage = getUIMessage(message, username);
+        Room activeRoom = roomService.getRoomByName(messageDTO.getTo()).orElseThrow(Exception::new);
 
-        Optional<Room> room = roomService.getRoomByUser(user);
+        MessageDTO frontMessage = getUIMessage(messageDTO, user);
 
-        if (!("text".equals(frontMessage.getTypeOfMessage()))) {
-            String json = g.toJson(frontMessage);
+        String json = g.toJson(frontMessage);
 
+        if (!("text".equals(frontMessage.getTypeOfMessage()) && !("".equals(frontMessage.getTo())))) {
             webSocketSession.sendMessage(new TextMessage(json));
-        } else {
-            if (room.isPresent()) {
-                Set<User> users = userRoom.get(room.get().getName());
 
-                saveMessage(message, room.get());
+            return;
+        }
 
-                String json = g.toJson(frontMessage);
-                for (User u : users) {
-                    WebSocketSession session = sessions.get(u.getUsername());
+        Set<User> participants = activeRoom.getParticipants();
 
-                    if (session != null) {
-                        session.sendMessage(new TextMessage(json));
-                    }
-                }
-            } else {
-                String json = g.toJson(frontMessage);
-
-                Set<WebSocketSession> sessionList = sendToMainPage();
-
-                for (WebSocketSession session : sessionList) {
-                    session.sendMessage(new TextMessage(json));
-                }
-            }
+        for(User takeUser : participants){
+            sessions.get(takeUser.getUsername()).sendMessage(new TextMessage(json));
         }
     }
 
@@ -107,14 +77,13 @@ public class ChatWebSocketHandler implements WebSocketHandler {
         return false;
     }
 
-    private MessageDTO getUIMessage(Message message, String username) throws Exception {
+    private MessageDTO getUIMessage(MessageDTO message, User user) throws Exception {
         String text = message.getMessage();
-        User user = userService.getByUsername(username).orElseThrow(Exception::new);
         Long id = message.getId();
 
         MessageDTO frontMessage = new MessageDTO();
 
-        frontMessage.setUsername(username);
+        frontMessage.setFrom(user.getUsername());
         frontMessage.setId(id);
 
         if (text.contains("//")) {
@@ -126,8 +95,9 @@ public class ChatWebSocketHandler implements WebSocketHandler {
 
             frontMessage.setMessage(answer.getMessage()[0]);
             frontMessage.setTypeOfMessage(answer.getStatus());
+            frontMessage.setTo(message.getTo());
 
-            if (answer.getStatus().equals("Connect")) {
+           /* if (answer.getStatus().equals("Connect")) {
                 Optional<Room> room = roomService.getRoomByUser(user);
 
                 if (room.isPresent()) {
@@ -140,9 +110,11 @@ public class ChatWebSocketHandler implements WebSocketHandler {
             if (answer.getStatus().equals("Create")) {
                 userRoom.put(answer.getMessage()[0], new HashSet<>());
                 frontMessage.setMessage(messageSource.getMessage("success.createRoom", new Object[0], Locale.getDefault()));
-            }
+            }*/
 
         } else {
+            saveMessage(frontMessage,user);
+
             frontMessage.setMessage(text);
             frontMessage.setTypeOfMessage("text");
         }
@@ -150,40 +122,13 @@ public class ChatWebSocketHandler implements WebSocketHandler {
         return frontMessage;
     }
 
-    private Message saveMessage(MessageDTO messageDTO, String username) throws Exception {
-
+    private void saveMessage(MessageDTO messageDTO, User user) throws Exception {
         Message message = new Message();
 
         message.setMessage(messageDTO.getMessage());
+        message.setAuthor(user);
 
-        User saveUser = userService.getByUsername(username).orElseThrow(Exception::new);
-        message.setAuthor(saveUser);
-
-        Message messageReturn = messageService.save(message).orElseThrow(() -> new MessageNotSaveException("Ошибка сохранения в БД"));
-
-        return messageReturn;
+        messageService.save(message).orElseThrow(() -> new MessageNotSaveException("Ошибка сохранения в БД"));
     }
 
-    private Message saveMessage(Message message, Room room) {
-        Message messageReturn = roomService.addMessage(message, room);
-
-        return messageReturn;
-    }
-
-    private Set<WebSocketSession> sendToMainPage() {
-        Set<WebSocketSession> socketSessions = new HashSet<>();
-
-        for (WebSocketSession session : sessions.values()) {
-            socketSessions.add(session);
-        }
-
-        for (String room : userRoom.keySet()) {
-            for (User user : userRoom.get(room)) {
-                WebSocketSession rmSession = sessions.get(user.getUsername());
-                socketSessions.remove(rmSession);
-            }
-        }
-
-        return socketSessions;
-    }
 }
