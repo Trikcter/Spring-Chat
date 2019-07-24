@@ -71,17 +71,10 @@ public class RoomServiceImpl implements RoomService {
 
         List<Room> openRooms = roomRepository.findRoomByIsLocked(false);
 
-        Optional<Room> participantRoom = roomRepository.findRoomByParticipants(user);
-
         Optional<Room> banRoomOptional = roomRepository.findRoomBybanList(user);
 
         roomSet.addAll(rooms);
         roomSet.addAll(openRooms);
-
-        if (participantRoom.isPresent()) {
-            Room room = participantRoom.get();
-            roomSet.add(room);
-        }
 
         if(banRoomOptional.isPresent()){
             Room banRoom = banRoomOptional.get();
@@ -89,11 +82,6 @@ public class RoomServiceImpl implements RoomService {
         }
 
         return roomSet;
-    }
-
-    @Override
-    public Optional<Room> getRoomByUser(User user) {
-        return roomRepository.findRoomByParticipants(user);
     }
 
     @Override
@@ -122,5 +110,14 @@ public class RoomServiceImpl implements RoomService {
         room.setBanList(banList);
 
         roomRepository.save(room);
+    }
+
+    @Override
+    public Room getActiveRoom(String username) {
+        User user = userService.getByUsername(username).orElse(new User());
+
+        Room room = roomRepository.findFirstRoomByOwner(user).orElse(new Room());
+
+        return room;
     }
 }

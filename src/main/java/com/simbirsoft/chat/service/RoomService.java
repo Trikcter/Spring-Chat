@@ -23,11 +23,11 @@ public interface RoomService {
 
     Set<Room> getRoomsByUsername(String username);
 
-    Optional<Room> getRoomByUser(User user);
-
     List<Room> getAll();
 
     void banUser(User user, Room room);
 
     void unbanUser(User user, Room room);
+
+    Room getActiveRoom(String username);
 }

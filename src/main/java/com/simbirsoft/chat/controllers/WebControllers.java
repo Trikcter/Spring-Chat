@@ -39,10 +39,12 @@ public class WebControllers {
         }
 
         Set<Room> rooms = roomService.getRoomsByUsername(username);
+        Room activeRoom = roomService.getActiveRoom(username);
 
         model.addAttribute("username", username);
         model.addAttribute("isSuperuser", isSuperuser);
         model.addAttribute("rooms", rooms);
+        model.addAttribute("activeRoom",activeRoom.getName());
 
         return "messages";
     }

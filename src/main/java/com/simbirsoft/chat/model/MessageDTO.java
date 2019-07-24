@@ -1,11 +1,16 @@
 package com.simbirsoft.chat.model;
 
+import com.simbirsoft.chat.entity.Message;
+
+import java.util.List;
+
 public class MessageDTO {
     private Long id;
     private String message;
     private String from;
     private String typeOfMessage;
     private String to;
+    private List<Message> historyOfMessage;
 
     public String getMessage() {
         return message;
@@ -45,5 +50,13 @@ public class MessageDTO {
 
     public void setTo(String to) {
         this.to = to;
+    }
+
+    public List<Message> getHistoryOfMessage() {
+        return historyOfMessage;
+    }
+
+    public void setHistoryOfMessage(List<Message> historyOfMessage) {
+        this.historyOfMessage = historyOfMessage;
     }
 }

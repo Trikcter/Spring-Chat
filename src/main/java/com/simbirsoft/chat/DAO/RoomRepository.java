@@ -14,7 +14,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 
     List<Room> findRoomByIsLocked(Boolean isLocked);
 
-    Optional<Room> findRoomByParticipants(User user);
-
     Optional<Room> findRoomBybanList(User user);
+
+    Optional<Room> findFirstRoomByOwner(User user);
 }

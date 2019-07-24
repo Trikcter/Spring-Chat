@@ -39,21 +39,21 @@ public class BanCommand implements BasicCommand {
             return new GenericRs("Error", new String[]{messageSource.getMessage("error.userNotFound", new Object[0], Locale.getDefault())});
         }
 
-        User userBan = banUser.get();
+        User bannedUser = banUser.get();
 
-        if (!(userBan.getActive())) {
+        if (!(bannedUser.getActive().getEnable())) {
             return new GenericRs("Error", new String[]{messageSource.getMessage("error.alreadyBan", new Object[0], Locale.getDefault())});
         }
 
         if (command.getCommands().length > 4 && "-m".equals(command.getCommands()[3]) && !("".equals(command.getCommands()[4]))) {
-            BanTask(userBan,command);
+            BanTask(bannedUser,command);
         } else {
             if (command.getCommands().length > 4 && "-l".equals(command.getCommands()[3]) && !("".equals(command.getCommands()[4]))) {
-                userService.deleteFromAllRooms(userBan);
+                userService.deleteFromAllRooms(bannedUser);
             }
         }
 
-        userService.blockUser(userBan.getId());
+        userService.blockUser(bannedUser.getId());
 
         return new GenericRs("Ok", new String[]{"success.userBan"});
     }

@@ -1,6 +1,10 @@
 var sock = new SockJS('/chat');
+var currentRoom;
 
 sock.onopen = function() {
+    var room = document.getElementById("activeRoom")
+    currentRoom = room.value;
+
     console.log('open');
 };
 
@@ -13,7 +17,7 @@ sock.onmessage = function(e) {
 
     switch(type){
         case "text":
-            drawMessage(words.id,words.username,words.message);
+            drawMessage(words.id,words.from,words.message);
             break;
         case "Error":
             alert("Ошибка");
@@ -27,7 +31,15 @@ sock.onmessage = function(e) {
             break;
         case "Connect":
             alert("Вы подключились к комнате");
-            rename(words.message);
+            currentRoom = words.to;
+
+            var room = document.getElementById("activeRoom")
+            room.value = currentRoom;
+
+            for(var i = 0;i<words.historyOfMessage.length;i++){
+                drawMessage(words.historyOfMessage[i].id,words.historyOfMessage[i].author.username,words.historyOfMessage[i].message);
+            }
+
             break;
     }
 };
@@ -48,7 +60,8 @@ function sendMessage(){
     var payload = element.value;
 
     var msg = {
-        "message":payload
+        "message":payload,
+        "to": currentRoom
     }
 
     var message = JSON.stringify(msg);
@@ -103,7 +116,3 @@ function drawMessage(id,username,payload){
     messages.appendChild(messageElement);
 }
 
-function rename(newName){
-    var username = document.getElementById("username")
-    username.innerText = newName;
-}

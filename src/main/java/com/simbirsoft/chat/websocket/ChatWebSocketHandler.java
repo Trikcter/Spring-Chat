@@ -43,23 +43,36 @@ public class ChatWebSocketHandler implements WebSocketHandler {
 
         User user = userService.getByUsername(username).orElseThrow((Exception::new));
 
-        Room activeRoom = roomService.getRoomByName(messageDTO.getTo()).orElseThrow(Exception::new);
+        Optional<Room> room = roomService.getRoomByName(messageDTO.getTo());
 
-        MessageDTO frontMessage = getUIMessage(messageDTO, user);
+        MessageDTO frontMessage = getUIMessage(messageDTO, user,room);
 
         String json = g.toJson(frontMessage);
 
-        if (!("text".equals(frontMessage.getTypeOfMessage()) && !("".equals(frontMessage.getTo())))) {
+        if (!("text".equals(frontMessage.getTypeOfMessage()))) {
             webSocketSession.sendMessage(new TextMessage(json));
 
             return;
         }
 
-        Set<User> participants = activeRoom.getParticipants();
+        if(room.isPresent()){
+            Room activeRoom = room.get();
 
-        for(User takeUser : participants){
-            sessions.get(takeUser.getUsername()).sendMessage(new TextMessage(json));
+            Set<User> participants = activeRoom.getParticipants();
+
+            for(User takeUser : participants){
+                if(sessions.keySet().contains(takeUser.getUsername())) {
+                    sessions.get(takeUser.getUsername()).sendMessage(new TextMessage(json));
+                }
+            }
+
+            return;
         }
+
+        for(WebSocketSession session : sessions.values()){
+            session.sendMessage(new TextMessage(json));
+        }
+
     }
 
     @Override
@@ -77,14 +90,12 @@ public class ChatWebSocketHandler implements WebSocketHandler {
         return false;
     }
 
-    private MessageDTO getUIMessage(MessageDTO message, User user) throws Exception {
+    private MessageDTO getUIMessage(MessageDTO message, User user, Optional<Room> currentRoom) throws Exception {
         String text = message.getMessage();
-        Long id = message.getId();
 
         MessageDTO frontMessage = new MessageDTO();
 
         frontMessage.setFrom(user.getUsername());
-        frontMessage.setId(id);
 
         if (text.contains("//")) {
             StringBuilder command = new StringBuilder(text);
@@ -97,38 +108,41 @@ public class ChatWebSocketHandler implements WebSocketHandler {
             frontMessage.setTypeOfMessage(answer.getStatus());
             frontMessage.setTo(message.getTo());
 
-           /* if (answer.getStatus().equals("Connect")) {
-                Optional<Room> room = roomService.getRoomByUser(user);
+            if (answer.getStatus().equals("Connect")) {
+                Room room = roomService.getRoomByName(answer.getMessage()[0]).orElse(new Room());
+                List<Message> hMessage = room.getMessages();
 
-                if (room.isPresent()) {
-                    userRoom.get(room.get().getName()).add(user);
-                }
-
-                frontMessage.setMessage(messageSource.getMessage("success.openConnection", new Object[0], Locale.getDefault()));
+                frontMessage.setTypeOfMessage("Connect");
+                frontMessage.setTo(answer.getMessage()[0]);
+                frontMessage.setHistoryOfMessage(hMessage);
             }
 
-            if (answer.getStatus().equals("Create")) {
-                userRoom.put(answer.getMessage()[0], new HashSet<>());
-                frontMessage.setMessage(messageSource.getMessage("success.createRoom", new Object[0], Locale.getDefault()));
-            }*/
-
         } else {
-            saveMessage(frontMessage,user);
-
             frontMessage.setMessage(text);
             frontMessage.setTypeOfMessage("text");
+
+            Long id = saveMessage(frontMessage,user,currentRoom);
+
+            frontMessage.setId(id);
         }
 
         return frontMessage;
     }
 
-    private void saveMessage(MessageDTO messageDTO, User user) throws Exception {
+    private Long saveMessage(MessageDTO messageDTO, User user,Optional<Room> room) throws Exception {
         Message message = new Message();
 
         message.setMessage(messageDTO.getMessage());
         message.setAuthor(user);
 
-        messageService.save(message).orElseThrow(() -> new MessageNotSaveException("Ошибка сохранения в БД"));
+        Message savedMessage = messageService.save(message).orElseThrow(() -> new MessageNotSaveException("Ошибка сохранения в БД"));
+
+        if(room.isPresent()){
+            Room saveRoom = room.get();
+            roomService.addMessage(savedMessage,saveRoom);
+        }
+
+        return savedMessage.getId();
     }
 
 }

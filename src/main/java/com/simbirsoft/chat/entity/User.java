@@ -16,8 +16,9 @@ public class User {
     @Column
     private String password;
 
-    @Column
-    private Boolean active;
+    @OneToOne
+    @JoinColumn(name = "active_id")
+    private UserBan active;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
@@ -51,14 +52,6 @@ public class User {
         this.username = username;
     }
 
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(boolean active) {
-        this.active = active;
-    }
-
     public Set<Role> getRoles() {
         return roles;
     }
@@ -69,5 +62,13 @@ public class User {
 
     public void addRole(Role role) {
         roles.add(role);
+    }
+
+    public UserBan getActive() {
+        return active;
+    }
+
+    public void setActive(UserBan active) {
+        this.active = active;
     }
 }

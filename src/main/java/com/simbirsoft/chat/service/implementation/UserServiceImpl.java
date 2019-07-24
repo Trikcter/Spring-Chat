@@ -1,12 +1,13 @@
 package com.simbirsoft.chat.service.implementation;
 
-import com.simbirsoft.chat.DAO.RoomRepository;
 import com.simbirsoft.chat.DAO.UserRepository;
 import com.simbirsoft.chat.entity.Role;
 import com.simbirsoft.chat.entity.Room;
 import com.simbirsoft.chat.entity.User;
+import com.simbirsoft.chat.entity.UserBan;
 import com.simbirsoft.chat.model.UserDTO;
 import com.simbirsoft.chat.service.RoomService;
+import com.simbirsoft.chat.service.UserBanService;
 import com.simbirsoft.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,10 +22,10 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private RoomRepository roomRepository;
+    private RoomService roomService;
 
     @Autowired
-    private RoomService roomService;
+    private UserBanService userBanService;
 
     @Override
     public void addUser(UserDTO userDTO) {
@@ -32,7 +33,10 @@ public class UserServiceImpl implements UserService {
 
         User user = new User();
         user.setRoles(Collections.singleton(Role.USER));
-        user.setActive(true);
+
+        UserBan condition = userBanService.addCondition(true);
+
+        user.setActive(condition);
         user.setUsername(userDTO.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode("user"));
 
@@ -68,7 +72,7 @@ public class UserServiceImpl implements UserService {
         for (User user : users) {
             UserDTO userDTO = new UserDTO();
 
-            userDTO.setActive(user.getActive());
+            userDTO.setActive(user.getActive().getEnable());
             userDTO.setUsername(user.getUsername());
             userDTO.setId(user.getId());
 
@@ -91,7 +95,10 @@ public class UserServiceImpl implements UserService {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
         user.setRoles(Collections.singleton(Role.USER));
-        user.setActive(true);
+
+        UserBan condition = userBanService.addCondition(true);
+
+        user.setActive(condition);
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 
         return userRepository.save(user);
@@ -120,7 +127,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void blockUser(Long id) {
         User user = userRepository.findById(id).orElse(new User());
-        user.setActive(false);
+
+        UserBan condition = userBanService.addCondition(false);
+
+        user.setActive(condition);
 
         userRepository.save(user);
     }
@@ -128,14 +138,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public void unblockUser(Long id) {
         User user = userRepository.findById(id).orElse(new User());
-        user.setActive(true);
+
+        UserBan condition = userBanService.addCondition(true);
+
+        user.setActive(condition);
 
         userRepository.save(user);
     }
 
     @Override
     public void deleteFromAllRooms(User user) {
-        Optional<Room> deleteRoom = roomRepository.findRoomByParticipants(user);
+        /*Optional<Room> deleteRoom = roomRepository.findRoomByParticipants(user);
 
         if (deleteRoom.isPresent()) {
             Set<User> participants;
@@ -151,6 +164,19 @@ public class UserServiceImpl implements UserService {
             }
 
             room.setParticipants(participants);
+
+            roomService.addRoom(room);
+        }*/
+
+        Set<Room> deleteRooms = roomService.getRoomsByUsername(user.getUsername());
+
+        for (Room room : deleteRooms) {
+            for (User deleteUser : room.getParticipants()) {
+                if (deleteUser.getUsername().equals(user.getUsername())) {
+                    deleteRooms.remove(deleteUser);
+                    break;
+                }
+            }
 
             roomService.addRoom(room);
         }
