@@ -4,17 +4,22 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-public class UserBan {
+@Table(name = "user_disconnect")
+public class RoomBan {
     @Id
     @GeneratedValue
-    private Long id;
+    Long id;
 
     @Column
-    private Date dateTo;
+    Date dateTo;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User bannedUser;
+
+    @ManyToOne
+    @JoinColumn(name = "room_id")
+    private Room bannedRoom;
 
     public Long getId() {
         return id;
@@ -24,12 +29,12 @@ public class UserBan {
         this.id = id;
     }
 
-    public Date getDateTo() {
+    public Date getTo() {
         return dateTo;
     }
 
-    public void setDateTo(Date dateTo) {
-        this.dateTo = dateTo;
+    public void setTo(Date to) {
+        this.dateTo = to;
     }
 
     public User getBannedUser() {
@@ -38,5 +43,13 @@ public class UserBan {
 
     public void setBannedUser(User bannedUser) {
         this.bannedUser = bannedUser;
+    }
+
+    public Room getBannedRoom() {
+        return bannedRoom;
+    }
+
+    public void setBannedRoom(Room bannedRoom) {
+        this.bannedRoom = bannedRoom;
     }
 }

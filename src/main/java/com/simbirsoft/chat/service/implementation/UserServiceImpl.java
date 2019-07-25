@@ -33,10 +33,7 @@ public class UserServiceImpl implements UserService {
 
         User user = new User();
         user.setRoles(Collections.singleton(Role.USER));
-
-        UserBan condition = userBanService.addCondition(true);
-
-        user.setActive(condition);
+        user.setEnable(true);
         user.setUsername(userDTO.getUsername());
         user.setPassword(bCryptPasswordEncoder.encode("user"));
 
@@ -72,7 +69,7 @@ public class UserServiceImpl implements UserService {
         for (User user : users) {
             UserDTO userDTO = new UserDTO();
 
-            userDTO.setActive(user.getActive().getEnable());
+            userDTO.setActive(user.getEnable());
             userDTO.setUsername(user.getUsername());
             userDTO.setId(user.getId());
 
@@ -95,10 +92,7 @@ public class UserServiceImpl implements UserService {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
         user.setRoles(Collections.singleton(Role.USER));
-
-        UserBan condition = userBanService.addCondition(true);
-
-        user.setActive(condition);
+        user.setEnable(true);
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
 
         return userRepository.save(user);
@@ -128,9 +122,7 @@ public class UserServiceImpl implements UserService {
     public void blockUser(Long id) {
         User user = userRepository.findById(id).orElse(new User());
 
-        UserBan condition = userBanService.addCondition(false);
-
-        user.setActive(condition);
+        user.setEnable(false);
 
         userRepository.save(user);
     }
@@ -139,46 +131,28 @@ public class UserServiceImpl implements UserService {
     public void unblockUser(Long id) {
         User user = userRepository.findById(id).orElse(new User());
 
-        UserBan condition = userBanService.addCondition(true);
-
-        user.setActive(condition);
+        user.setEnable(true);
 
         userRepository.save(user);
     }
 
     @Override
     public void deleteFromAllRooms(User user) {
-        /*Optional<Room> deleteRoom = roomRepository.findRoomByParticipants(user);
-
-        if (deleteRoom.isPresent()) {
-            Set<User> participants;
-            participants = deleteRoom.get().getParticipants();
-
-            Room room = deleteRoom.get();
-
-            for (User rmUser : participants) {
-                if (rmUser.getUsername().equals(user.getUsername())) {
-                    participants.remove(rmUser);
-                    break;
-                }
-            }
-
-            room.setParticipants(participants);
-
-            roomService.addRoom(room);
-        }*/
-
         Set<Room> deleteRooms = roomService.getRoomsByUsername(user.getUsername());
 
-        for (Room room : deleteRooms) {
-            for (User deleteUser : room.getParticipants()) {
-                if (deleteUser.getUsername().equals(user.getUsername())) {
-                    deleteRooms.remove(deleteUser);
+        for(Room room : deleteRooms){
+            Set<User> rmUsers = room.getParticipants();
+
+            for(User rmUser: rmUsers){
+                if (rmUser.getUsername().equals(user.getUsername())) {
+                    rmUsers.remove(rmUser);
+
+                    room.setParticipants(rmUsers);
+                    roomService.addRoom(room);
+
                     break;
                 }
             }
-
-            roomService.addRoom(room);
         }
     }
 }

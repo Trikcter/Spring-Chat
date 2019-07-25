@@ -4,6 +4,7 @@ import com.simbirsoft.chat.DAO.RoomRepository;
 import com.simbirsoft.chat.entity.Message;
 import com.simbirsoft.chat.entity.Room;
 import com.simbirsoft.chat.entity.User;
+import com.simbirsoft.chat.service.RoomBanService;
 import com.simbirsoft.chat.service.RoomService;
 import com.simbirsoft.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ public class RoomServiceImpl implements RoomService {
     private RoomRepository roomRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private RoomBanService roomBanService;
 
     @Override
     public Room addRoom(Room room) {
@@ -71,14 +74,13 @@ public class RoomServiceImpl implements RoomService {
 
         List<Room> openRooms = roomRepository.findRoomByIsLocked(false);
 
-        Optional<Room> banRoomOptional = roomRepository.findRoomBybanList(user);
+        List<Room> banRooms = roomRepository.findRoomBybanList(user);
 
         roomSet.addAll(rooms);
         roomSet.addAll(openRooms);
 
-        if(banRoomOptional.isPresent()){
-            Room banRoom = banRoomOptional.get();
-            roomSet.remove(banRoom);
+        for(Room rmRoom : banRooms){
+            roomSet.remove(rmRoom);
         }
 
         return roomSet;
@@ -96,8 +98,16 @@ public class RoomServiceImpl implements RoomService {
         banList.add(user);
 
         room.setBanList(banList);
+        Set<User> newList = room.getParticipants();
 
-        userService.deleteFromAllRooms(user);
+        for(User rmUser : newList){
+            if(rmUser.getUsername().equals(user.getUsername())){
+                newList.remove(rmUser);
+            }
+        }
+
+        room.setParticipants(newList);
+
         roomRepository.save(room);
     }
 
@@ -105,7 +115,11 @@ public class RoomServiceImpl implements RoomService {
     public void unbanUser(User user, Room room) {
         Set<User> banList = room.getBanList();
 
-        banList.remove(user);
+        for(User rmUser : banList){
+            if(rmUser.getUsername().equals(user.getUsername())){
+                banList.remove(rmUser);
+            }
+        }
 
         room.setBanList(banList);
 

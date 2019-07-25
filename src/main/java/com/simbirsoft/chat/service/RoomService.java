@@ -4,6 +4,7 @@ import com.simbirsoft.chat.entity.Message;
 import com.simbirsoft.chat.entity.Room;
 import com.simbirsoft.chat.entity.User;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -27,7 +28,7 @@ public interface RoomService {
 
     void banUser(User user, Room room);
 
-    void unbanUser(User user, Room room);
+    void unbanUser(User user,Room room);
 
     Room getActiveRoom(String username);
 }

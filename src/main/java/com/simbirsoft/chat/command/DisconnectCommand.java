@@ -4,6 +4,7 @@ import com.simbirsoft.chat.entity.Room;
 import com.simbirsoft.chat.entity.User;
 import com.simbirsoft.chat.model.CommandAttribute;
 import com.simbirsoft.chat.model.GenericRs;
+import com.simbirsoft.chat.service.RoomBanService;
 import com.simbirsoft.chat.service.RoomService;
 import com.simbirsoft.chat.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ public class DisconnectCommand implements BasicCommand {
     private MessageSource messageSource;
     @Autowired
     private UserService userService;
+    @Autowired
+    private RoomBanService roomBanService;
 
     @Override
     public GenericRs executeCommand(CommandAttribute command, User user) {
@@ -51,22 +54,10 @@ public class DisconnectCommand implements BasicCommand {
                 long timeToBan = Integer.parseInt(command.getCommands()[6]);
                 timeToBan = timeToBan * 60000;
 
-                TimerTask task = new TimerTask() {
-                    public void run() {
-                        roomService.unbanUser(banUser,room);
-                        cancel();
-                    }
-                };
+                Date now = new Date();
+                Date to = new Date(now.getTime() + timeToBan);
 
-                Timer timer = new Timer("TimerForUnBanRoom");
-
-                timer.scheduleAtFixedRate(task, timeToBan, 1000L);
-
-                try {
-                    Thread.sleep(1000L * 2);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                roomBanService.addBan(banUser,room,to);
             }
 
         }else {

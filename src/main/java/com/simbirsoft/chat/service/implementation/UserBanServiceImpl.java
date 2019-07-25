@@ -6,7 +6,7 @@ import com.simbirsoft.chat.service.UserBanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.util.List;
 
 @Service
 public class UserBanServiceImpl implements UserBanService {
@@ -14,20 +14,17 @@ public class UserBanServiceImpl implements UserBanService {
     private UserBanRepository userBanRepository;
 
     @Override
-    public UserBan addCondition(Boolean enable, Date dateFrom, Date dateTo) {
-        return null;
+    public void addBan(UserBan userBan) {
+        userBanRepository.save(userBan);
     }
 
     @Override
-    public UserBan addCondition(Boolean enable) {
-        UserBan condition = new UserBan();
-        condition.setEnable(enable);
-
-        return userBanRepository.save(condition);
+    public List<UserBan> getAll() {
+        return userBanRepository.findAll();
     }
 
     @Override
-    public UserBan editCondition() {
-        return null;
+    public void deleteTask(UserBan userBan) {
+        userBanRepository.delete(userBan);
     }
 }

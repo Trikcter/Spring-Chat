@@ -16,9 +16,7 @@ public class User {
     @Column
     private String password;
 
-    @OneToOne
-    @JoinColumn(name = "active_id")
-    private UserBan active;
+    private Boolean enable;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"))
@@ -64,11 +62,11 @@ public class User {
         roles.add(role);
     }
 
-    public UserBan getActive() {
-        return active;
+    public Boolean getEnable() {
+        return enable;
     }
 
-    public void setActive(UserBan active) {
-        this.active = active;
+    public void setEnable(Boolean enable) {
+        this.enable = enable;
     }
 }

@@ -1,6 +1,7 @@
 package com.simbirsoft.chat.DAO;
 
 import com.simbirsoft.chat.entity.User;
+import com.simbirsoft.chat.entity.UserBan;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

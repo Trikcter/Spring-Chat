@@ -2,12 +2,12 @@ package com.simbirsoft.chat.service;
 
 import com.simbirsoft.chat.entity.UserBan;
 
-import java.util.Date;
+import java.util.List;
 
 public interface UserBanService {
-    UserBan addCondition(Boolean enable, Date dateFrom, Date dateTo);
+    void addBan(UserBan userBan);
 
-    UserBan addCondition(Boolean enable);
+    List<UserBan> getAll();
 
-    UserBan editCondition();
+    void deleteTask(UserBan userBan);
 }
