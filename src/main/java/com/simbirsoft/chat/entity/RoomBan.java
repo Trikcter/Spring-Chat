@@ -7,7 +7,7 @@ import java.util.Date;
 @Table(name = "user_disconnect")
 public class RoomBan {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @Column

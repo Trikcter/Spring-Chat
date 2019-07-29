@@ -9,7 +9,7 @@ import java.util.Set;
 @Entity
 public class Room {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column

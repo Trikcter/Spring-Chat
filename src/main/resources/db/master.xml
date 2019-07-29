@@ -7,7 +7,7 @@
     <!-- Tables -->
     <changeSet author="Bolgov" id="Bolgov-1" failOnError="false">
         <createTable tableName="user_role">
-            <column name="user_id" type="bigint" autoIncrement="true" />
+            <column name="user_id" type="bigint"/>
             <column name="roles" type="varchar(255)"/>
         </createTable>
 
@@ -15,18 +15,150 @@
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="from" type="varchar(255)"/>
-            <column name="password" type="varchar(255)"/>
-            <column name="active" type="boolean"/>
+            <column name="username" type="text"/>
+            <column name="password" type="text"/>
+            <column name="enable" type="boolean"/>
         </createTable>
 
         <createTable tableName="message">
             <column name="id" type="bigint" autoIncrement="true">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="from" type="varchar(255)"/>
-            <column name="message" type="varchar(255)"/>
+            <column name="user_id" type="bigint"/>
+            <column name="message" type="text"/>
         </createTable>
+    </changeSet>
+
+    <changeSet author="Bolgov" id="Bolgov-2" failOnError="false">
+        <createTable tableName="ban_list">
+            <column name="room_id" type="bigint"/>
+            <column name="user_id" type="bigint"/>
+        </createTable>
+
+        <createTable tableName="history_of_message">
+            <column name="room_id" type="bigint"/>
+            <column name="message_id" type="bigint"/>
+        </createTable>
+
+        <createTable tableName="room">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="text"/>
+            <column name="user_id" type="bigint"/>
+            <column name="is_locked" type="boolean"/>
+        </createTable>
+
+        <createTable tableName="participant_of_room">
+            <column name="room_id" type="bigint"/>
+            <column name="user_id" type="bigint"/>
+        </createTable>
+
+        <createTable tableName="user_ban">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="date_to" type="datetime"/>
+            <column name="user_id" type="bigint"/>
+        </createTable>
+
+        <createTable tableName="user_disconnect">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="date_to" type="datetime"/>
+            <column name="user_id" type="bigint"/>
+            <column name="room_id" type="bigint"/>
+        </createTable>
+    </changeSet>
+
+    <!-- Foreign keys -->
+    <changeSet author="Bolgov" id="Bolgov-3">
+        <addForeignKeyConstraint
+            baseColumnNames="user_id"
+            baseTableName="room"
+            constraintName="fk_room_owner"
+            referencedColumnNames="id"
+            referencedTableName="person"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="user_id"
+                baseTableName="message"
+                constraintName="fk_message_from"
+                referencedColumnNames="id"
+                referencedTableName="person"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="user_id"
+                baseTableName="user_disconnect"
+                constraintName="fk_user_disconnect"
+                referencedColumnNames="id"
+                referencedTableName="person"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="room_id"
+                baseTableName="user_disconnect"
+                constraintName="fk_room_disconnect"
+                referencedColumnNames="id"
+                referencedTableName="room"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="user_id"
+                baseTableName="user_ban"
+                constraintName="fk_ban_user"
+                referencedColumnNames="id"
+                referencedTableName="person"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="user_id"
+                baseTableName="participant_of_room"
+                constraintName="fk_participant_user"
+                referencedColumnNames="id"
+                referencedTableName="person"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="room_id"
+                baseTableName="participant_of_room"
+                constraintName="fk_participant_room"
+                referencedColumnNames="id"
+                referencedTableName="room"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="room_id"
+                baseTableName="history_of_message"
+                constraintName="fk_message_room"
+                referencedColumnNames="id"
+                referencedTableName="room"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="message_id"
+                baseTableName="history_of_message"
+                constraintName="fk_message_text"
+                referencedColumnNames="id"
+                referencedTableName="message"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="user_id"
+                baseTableName="ban_list"
+                constraintName="fk_user_ban"
+                referencedColumnNames="id"
+                referencedTableName="person"/>
+
+        <addForeignKeyConstraint
+                baseColumnNames="room_id"
+                baseTableName="ban_list"
+                constraintName="fk_room_list"
+                referencedColumnNames="id"
+                referencedTableName="room"/>
+
+    </changeSet>
+
+    <!-- Data -->
+    <changeSet author="Bolgov" id="Bolgov-4">
+        <insert tableName="person">
+            <column name="username" value="Admin"/>
+            <column name="password" value="$2a$10$ZZvi.vEZ5iaPbfu8RoQJdud6hWpAEBhgw4jwu/dZVr.00HuPUTHxa"/>
+        </insert>
     </changeSet>
 
 </databaseChangeLog>

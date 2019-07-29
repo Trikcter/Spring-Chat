@@ -62,7 +62,7 @@ public class BanCommand implements BasicCommand {
             userBanService.addBan(banTask);
         }
 
-        if (command.getCommands().length == 4 && "-l".equals(command.getCommands()[3])) {
+        if (command.getCommands().length == 5 && "-l".equals(command.getCommands()[4])) {
             userService.deleteFromAllRooms(bannedUser);
         }
 
