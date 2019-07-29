@@ -26,8 +26,10 @@ public class UserServiceImplTest {
     public void beforeTest(){
         User user = new User();
         user.setUsername("TestUser");
+        user.setId(1L);
 
         Mockito.when(userRepository.findByUsername("TestUser")).thenReturn(Optional.of(user));
+        Mockito.when(userRepository.save(Mockito.any(User.class))).thenReturn(user);
     }
 
     @Test
@@ -35,5 +37,14 @@ public class UserServiceImplTest {
         Optional<User> testUser = userService.getByUsername("TestUser");
 
         Assert.assertEquals("TestUser",testUser.get().getUsername());
+    }
+
+    @Test
+    public void saveUserTest(){
+        User testUser = new User();
+
+        User user = userService.save(testUser);
+
+        Assert.assertEquals(1,user.getId().intValue());
     }
 }
