@@ -1,4 +1,4 @@
-package com.simbirsoft.chat.Task;
+package com.simbirsoft.chat.task;
 
 import com.simbirsoft.chat.entity.Room;
 import com.simbirsoft.chat.entity.RoomBan;
